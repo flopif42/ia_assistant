@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Générateur de Contrat</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.8/dist/pizzip.min.js"></script>
+  <script src="https://unpkg.com/docxtemplater@3.32.3/build/docxtemplater.js"></script>
+</head>
+<body>
+  <div id="main">
+    <div id="chat">
+      <div class="message ai">Bonjour, quel est le nom du fournisseur ?</div>
+    </div>
+    <div id="inputBox">
+      <input type="text" id="userInput" placeholder="Tapez ici le nom du fournisseur..." />
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const userInput = document.getElementById('userInput');
+
+    userInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && userInput.value.trim() !== '') {
+        const nomFournisseur = userInput.value.trim();
+
+        // Display user message
+        const userMsg = document.createElement('div');
+        userMsg.className = 'message user';
+        userMsg.textContent = nomFournisseur;
+        chat.appendChild(userMsg);
+
+        // Display AI processing message
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'message ai';
+        aiMsg.textContent = 'Génération du contrat...';
+        chat.appendChild(aiMsg);
+
+        // Load and generate the document
+        fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/f8534338a01b73859bfbb66b6a61365bdf3bd1e2/template_contrat.docx')
+          .then(response => response.arrayBuffer())
+          .then(content => {
+            const zip = new PizZip(content);
+            const doc = new window.docxtemplater().loadZip(zip);
+            doc.setData({ NOM_FOURNISSEUR: nomFournisseur });
+
+            try {
+              doc.render();
+              const out = doc.getZip().generate({ type: 'blob' });
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(out);
+              link.download = 'contrat_generé.docx';
+              link.click();
+
+              const doneMsg = document.createElement('div');
+              doneMsg.className = 'message ai';
+              doneMsg.textContent = 'Votre contrat a été généré et téléchargé.';
+              chat.appendChild(doneMsg);
+            } catch (error) {
+              const errorMsg = document.createElement('div');
+              errorMsg.className = 'message ai';
+              errorMsg.textContent = "Une erreur est survenue lors de la génération.";
+              chat.appendChild(errorMsg);
+              console.error(error);
+            }
+          });
+
+        userInput.disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>
