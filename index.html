@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.8/dist/pizzip.min.js"></script>
   <script src="https://unpkg.com/docxtemplater@3.32.3/build/docxtemplater.js"></script>
+  <style>
+    /* Inline arrow icon for simplicity */
+    #sendButton svg {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
 </head>
 <body>
   <div id="main">
@@ -15,61 +22,92 @@
     </div>
     <div id="inputBox">
       <input type="text" id="userInput" placeholder="Tapez ici le nom du fournisseur..." />
+      <button id="sendButton" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12h14"></path>
+          <path d="M12 5l7 7-7 7"></path>
+        </svg>
+      </button>
     </div>
   </div>
 
   <script>
     const chat = document.getElementById('chat');
     const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+
+    userInput.addEventListener('input', () => {
+      sendButton.disabled = userInput.value.trim() === '';
+    });
+
+    function processInput() {
+      if (userInput.value.trim() === '') return;
+      const nomFournisseur = userInput.value.trim();
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.textContent = nomFournisseur;
+      chat.appendChild(userMsg);
+
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'message ai';
+      chat.appendChild(aiMsg);
+
+      fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/main/template_contrat.docx')
+        .then(response => response.arrayBuffer())
+        .then(content => {
+          const zip = new PizZip(content);
+          const doc = new window.docxtemplater().loadZip(zip);
+          doc.setData({ NOM_FOURNISSEUR: nomFournisseur });
+
+          try {
+            doc.render();
+            const out = doc.getZip().generate({ type: 'blob' });
+
+            aiMsg.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="spinner.gif" alt="Chargement..." width="24" height="24" />
+                <span>Génération du contrat...</span>
+              </div>
+            `;
+
+            setTimeout(() => {
+              aiMsg.innerHTML = 'Votre contrat est prêt :';
+
+              const downloadLink = document.createElement('a');
+              downloadLink.href = URL.createObjectURL(out);
+              downloadLink.download = 'contrat_generé.docx';
+              downloadLink.textContent = '📄 Télécharger le contrat';
+              downloadLink.style.display = 'inline-block';
+              downloadLink.style.marginTop = '0.5em';
+              downloadLink.style.textDecoration = 'none';
+              downloadLink.style.color = '#0056d2';
+              downloadLink.style.fontWeight = 'bold';
+
+              const aiLinkMsg = document.createElement('div');
+              aiLinkMsg.className = 'message ai';
+              aiLinkMsg.appendChild(downloadLink);
+              chat.appendChild(aiLinkMsg);
+              chat.scrollTop = chat.scrollHeight;
+            }, 2000);
+          } catch (error) {
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'message ai';
+            errorMsg.textContent = "Une erreur est survenue lors de la génération.";
+            chat.appendChild(errorMsg);
+            console.error(error);
+          }
+        });
+
+      userInput.disabled = true;
+      sendButton.disabled = true;
+    }
 
     userInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && userInput.value.trim() !== '') {
-        const nomFournisseur = userInput.value.trim();
-
-        // Display user message
-        const userMsg = document.createElement('div');
-        userMsg.className = 'message user';
-        userMsg.textContent = nomFournisseur;
-        chat.appendChild(userMsg);
-
-        // Display AI processing message
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'message ai';
-        aiMsg.textContent = 'Génération du contrat...';
-        chat.appendChild(aiMsg);
-
-        // Load and generate the document
-        fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/f8534338a01b73859bfbb66b6a61365bdf3bd1e2/template_contrat.docx')
-          .then(response => response.arrayBuffer())
-          .then(content => {
-            const zip = new PizZip(content);
-            const doc = new window.docxtemplater().loadZip(zip);
-            doc.setData({ NOM_FOURNISSEUR: nomFournisseur });
-
-            try {
-              doc.render();
-              const out = doc.getZip().generate({ type: 'blob' });
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(out);
-              link.download = 'contrat_generé.docx';
-              link.click();
-
-              const doneMsg = document.createElement('div');
-              doneMsg.className = 'message ai';
-              doneMsg.textContent = 'Votre contrat a été généré et téléchargé.';
-              chat.appendChild(doneMsg);
-            } catch (error) {
-              const errorMsg = document.createElement('div');
-              errorMsg.className = 'message ai';
-              errorMsg.textContent = "Une erreur est survenue lors de la génération.";
-              chat.appendChild(errorMsg);
-              console.error(error);
-            }
-          });
-
-        userInput.disabled = true;
-      }
+      if (e.key === 'Enter') processInput();
     });
+
+    sendButton.addEventListener('click', processInput);
   </script>
 </body>
 </html>
