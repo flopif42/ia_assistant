@@ -16,7 +16,7 @@ const responseMessages = [
     "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\nNom du fournisseur\nNuméro du contrat",
     "Veuillez saisir le nom du fournisseur:",
     "Veuillez saisir le numéro du contrat:",
-    "Confirmez-vous ces informations:\nNom du fournisseur: TOTO\nNuméro du contrat: 1234567 ?",
+    "Confirmez-vous ces informations:\nNom du fournisseur: NOM_FOURNISSEUR\nNuméro du contrat: NUM_CONTRAT ?",
     "Comment puis-je vous aider ?",
     "Je vais générer votre contrat."
 ];
@@ -81,13 +81,11 @@ function computeResponse(userRequest) {
             AIResponse = responseMessages[0];
         }
     } else if (contratCreationStep == 1) {
-        //AIResponse = 'Fournisseur = ' + userRequest + '.';
         AIResponse = responseMessages[3];
         contratData.nomFournisseur = userRequest;
         contratCreationStep = 2;
     } else if (contratCreationStep == 2) {
-        // AIResponse = 'Num contrat = ' + userRequest + '.';
-        AIResponse = responseMessages[4];
+        AIResponse = responseMessages[4].replace('NOM_FOURNISSEUR', contratData.nomFournisseur).replace('NUM_CONTRAT', contratData.numContrat);
         contratData.numContrat = userRequest;
         contratCreationStep = 3;
     } else if (contratCreationStep == 3) {
