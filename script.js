@@ -13,7 +13,7 @@ creation steps :
 
 const responseMessages = [
     "Je n'ai pas compris.",
-    "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\nNom du fournisseur\nNuméro du contrat",
+    "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\n• Nom du fournisseur\n• Numéro du contrat",
     "Veuillez saisir le nom du fournisseur:",
     "Veuillez saisir le numéro du contrat:",
     "Confirmez-vous ces informations:\nNom du fournisseur: NOM_FOURNISSEUR\nNuméro du contrat: NUM_CONTRAT ?",
@@ -41,6 +41,7 @@ function typeMessage(text, className = 'ai', delay = 2) {
                 setTimeout(typeChar, delay);
             } else {
                 resolve();
+                chat.scrollTop = chat.scrollHeight;
             }
         }
 
@@ -89,7 +90,7 @@ function computeResponse(userRequest) {
         AIResponse = responseMessages[4].replace('NOM_FOURNISSEUR', contratData.nomFournisseur).replace('NUM_CONTRAT', contratData.numContrat);
         contratCreationStep = 3;
     } else if (contratCreationStep == 3) {
-        if (lowercaseUserRequest.includes('oui')) {
+        if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
             contratData.validated = true;
             AIResponse = responseMessages[6];
         } else {
@@ -104,81 +105,84 @@ function computeResponse(userRequest) {
     return AIResponse;
 }
 
-userInput.addEventListener('keydown', async function (e) {
-    if (e.key === 'Enter' && userInput.value.trim() !== '') {
-        const userInputText = userInput.value.trim();
-        userInput.value = '';
+async function handleUserInput() {
+    const userInputText = userInput.value.trim();
+    if (!userInputText) return;
 
-        // User message
-        const userMsg = document.createElement('div');
-        userMsg.className = 'message user';
-        userMsg.textContent = userInputText;
-        chat.appendChild(userMsg);
+    userInput.value = '';
+    sendButton.disabled = true;
 
-        // AI message
-        await wait(400); // short delay before bot responds
-        const AIMsg = computeResponse(userInputText);
-        await typeMessage(AIMsg);
+    // User message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.textContent = userInputText;
+    chat.appendChild(userMsg);
+    chat.scrollTop = chat.scrollHeight;
 
-        // if all info has been filled, generate contrat
-        if (isContratDataComplete()) {
-            fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/main/template_contrat.docx')
-                .then(response => response.arrayBuffer())
-                .then(content => {
-                    const zip = new PizZip(content);
-                    const doc = new window.docxtemplater().loadZip(zip);
-                    doc.setData({
-                        NOM_FOURNISSEUR: contratData.nomFournisseur,
-                        NUM_CONTRAT: contratData.numContrat
-                    });
+    // AI message
+    await wait(400); // short delay before bot responds
+    const AIMsg = computeResponse(userInputText);
+    await typeMessage(AIMsg);
 
-                    doc.render();
-                    const out = doc.getZip().generate({ type: 'blob' });
+    // if all info has been filled, generate contrat
+    if (isContratDataComplete()) {
+        const response = await fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/main/template_contrat.docx');
+        const content = await response.arrayBuffer();
 
-                    const spinnerMessage = document.createElement('div');
-                    spinnerMessage.className = 'message ai';
-                    spinnerMessage.innerHTML = `
+        const zip = new PizZip(content);
+        const doc = new window.docxtemplater().loadZip(zip);
+        doc.setData({
+            NOM_FOURNISSEUR: contratData.nomFournisseur,
+            NUM_CONTRAT: contratData.numContrat
+        });
+        doc.render();
+        const out = doc.getZip().generate({ type: 'blob' });
+
+        // Show spinner
+        const spinnerMessage = document.createElement('div');
+        spinnerMessage.className = 'message ai';
+        spinnerMessage.innerHTML = `
 <div style="display: flex; align-items: center; gap: 10px;">
-<img src="spinner.gif" alt="Chargement..." width="24" height="24" />
-<span>Génération du document...</span>
+  <img src="spinner.gif" alt="Chargement..." width="24" height="24" />
+  <span>Génération du document...</span>
 </div>
 `;
-                    spinnerMessage.id = 'spinner';
-                    chat.appendChild(spinnerMessage);
-                    chat.scrollTop = chat.scrollHeight;
+        spinnerMessage.id = 'spinner';
+        chat.appendChild(spinnerMessage);
+        chat.scrollTop = chat.scrollHeight;
 
-                    // await wait(2000); // simulate PDF generation delay
+        await wait(1800); 
 
-                    // Remove spinner
-                    spinnerMessage.remove();
+        spinnerMessage.remove();
 
-                    // Show PDF generation message
-                    msg = "Votre document est prêt à être téléchargé.";
-                    typeMessage(msg);
+        msg = "Votre document est prêt à être téléchargé.";
+        await typeMessage(msg);
 
-                    const documentDownload = document.createElement('div');
-                    documentDownload.innerHTML = 'Votre contrat est prêt :';
+        const documentDownload = document.createElement('div');
+        documentDownload.innerHTML = 'Votre contrat est prêt :';
 
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = URL.createObjectURL(out);
-                    downloadLink.download = 'contrat_generé.docx';
-                    downloadLink.textContent = '📄 Télécharger le contrat';
-                    downloadLink.style.display = 'inline-block';
-                    downloadLink.style.marginTop = '0.5em';
-                    downloadLink.style.textDecoration = 'none';
-                    downloadLink.style.color = '#0056d2';
-                    downloadLink.style.fontWeight = 'bold';
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(out);
+        downloadLink.download = 'contrat_generé.docx';
+        downloadLink.textContent = '📄 Télécharger le contrat';
+        downloadLink.style.display = 'inline-block';
+        downloadLink.style.marginTop = '0.5em';
+        downloadLink.style.textDecoration = 'none';
+        downloadLink.style.color = '#0056d2';
+        downloadLink.style.fontWeight = 'bold';
 
-                    const aiLinkMsg = document.createElement('div');
-                    aiLinkMsg.className = 'message ai';
-                    aiLinkMsg.appendChild(downloadLink);
-                    chat.appendChild(aiLinkMsg);
-                    chat.scrollTop = chat.scrollHeight;
-                });
-        }
+        const aiLinkMsg = document.createElement('div');
+        aiLinkMsg.className = 'message ai';
+        aiLinkMsg.appendChild(downloadLink);
+        chat.appendChild(aiLinkMsg);
+        chat.scrollTop = chat.scrollHeight;
+    }
+}
 
-        console.log(userInputText);
+userInput.addEventListener('keydown', async function (e) {
+    if (e.key === 'Enter') {
+        handleUserInput();
     }
 });
 
-// sendButton.addEventListener('click', processInput);
+sendButton.addEventListener('click', handleUserInput);
