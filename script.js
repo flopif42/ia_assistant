@@ -22,12 +22,14 @@ const responseMessages = [
     "J'ai compris que vous souhaitez créer un contrat. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
         "• Nom du fournisseur\n" +
         "• Numéro du contrat\n" +
-        "• Adresse du fournisseur\n",
+        "• Adresse du fournisseur (rue, code postal, ville)\n",
 
     "Confirmez-vous les informations suivantes ?\n" + // 2
         "• Numéro du contrat : NUM_CONTRAT\n" +
         "• Nom du fournisseur : NOM_FOURNISSEUR\n" +
-        "• Adresse du fournisseur : ADR_FOURNISSEUR\n",
+        "• Adresse : ADR_FOURNISSEUR\n" +
+        "• Code postal : CP_FOURNISSEUR\n" +
+        "• Ville : VILLE_FOURNISSEUR\n",
 
     "Comment puis-je vous aider ?", // 3
     "Très bien, je vais générer votre contrat.", // 4
@@ -252,6 +254,13 @@ async function handleUserInput() {
             ADR_FOURNISSEUR: contratData.adresseFrns,
             CP_FOURNISSEUR: contratData.codePostalFrns,
             VILLE_FOURNISSEUR: contratData.villeFrns,
+
+            RS_FOURNISSEUR: contratData.raisonSociale,
+            CAPITAL_FOURNISSEUR: contratData.capitalFrns,
+            IMMAT_FOURNISSEUR: contratData.villeImmat,
+            RCS_FOURNISSEUR: contratData.numRCS,
+            REP_FOURNISSEUR: contratData.representantFrns,
+            FCT_REP_FOURNISSEUR: contratData.fonctionRepr
         });
         doc.render();
         const out = doc.getZip().generate({ type: 'blob' });
