@@ -17,7 +17,8 @@ const responseMessages = [
 
     "J'ai compris que vous souhaitez créer un contrat. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
     "• Nom du fournisseur\n" +
-    "• Numéro du contrat\n" +
+    "• Numéro du contrat\n\n" +
+    "Dans le cas d'un nouveau fournisseur:\n" +
     "• Adresse du fournisseur (code postal, ville, rue)\n" +
     "• Les informations juridiques (raison sociale, capital, numéro RCS et ville d'immatriculation)\n" +
     "• Les informations du représentant de la société (nom et fonction)\n",
@@ -61,7 +62,20 @@ const dataAlliance = {
     fonctionRepr: 'Président'
 }
 
-function computeResponse(userRequest) {
+async function getCityFromPostalCode(cp) {
+    try {
+        const response = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom&format=json`);
+        const data = await response.json();
+        if (data.length > 0) {
+            return data[0].nom; // assume first one (works in most cases)
+        }
+    } catch (err) {
+        console.error("Erreur lors de la récupération de la ville :", err);
+    }
+    return null;
+}
+
+async function computeResponse(userRequest) {
     let AIResponse;
     let lowercaseUserRequest = userRequest.toLocaleLowerCase();
     switch (processStep) {
@@ -97,8 +111,15 @@ function computeResponse(userRequest) {
                 // code postal
                 case 2:
                     contratData.codePostalFrns = userRequest;
-                    AIResponse = promptFournisseurData[3]; // demande la ville
-                    frnsDataSubstep = 3;
+                    const guessedCity = await getCityFromPostalCode(userRequest);
+                    if (guessedCity) {
+                        contratData.villeFrns = guessedCity;
+                        AIResponse = `${userRequest} correspond à la commune de ${guessedCity}. Souhaitez-vous utiliser cette donnée ?`;
+                        processStep = 99; // use a temporary step for city confirmation
+                    } else {
+                        AIResponse = "Je n’ai pas pu trouver de ville pour ce code postal. Veuillez la saisir manuellement :";
+                        frnsDataSubstep = 3;
+                    }
                     break;
 
                 // ville
@@ -222,6 +243,19 @@ function computeResponse(userRequest) {
                 frnsDataSubstep = 2;
             }
             break;
+
+        // confirmer l'utilisation de la ville retournée par l'API du gouv
+        case 99:
+            processStep = 2;
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                AIResponse = promptFournisseurData[4]; // demande adresse
+                frnsDataSubstep = 4;
+            } else {
+                AIResponse = promptFournisseurData[3];
+                frnsDataSubstep = 3;
+            }
+            break;
+
 
         default:
             AIResponse = responseMessages[0]; // "Je n'ai pas compris."

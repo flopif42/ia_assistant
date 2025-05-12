@@ -43,7 +43,7 @@ async function handleUserInput() {
 
     // AI message
     await wait(delayBeforeBotRespondsMs); // short delay before bot responds
-    const AIMsg = computeResponse(userInputText);
+    const AIMsg = await computeResponse(userInputText);
     await typeMessage(AIMsg);
 
     // if all info has been filled, generate contrat

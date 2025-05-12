@@ -28,19 +28,6 @@ function initContratData() {
     contratData.validated = false;
 }
 
-initContratData();
-
-// Initial greeting with typing effect
-window.addEventListener('DOMContentLoaded', async () => {
-    await wait(firstMsgDelayMs);
-    await typeMessage("Bonjour, comment puis-je vous aider ?");
-    chat.scrollTop = chat.scrollHeight;
-});
-
-userInput.addEventListener('input', () => {
-    sendButton.disabled = userInput.value.trim() === '';
-});
-
 function fillTemplate(template, data) {
     return Object.entries(data).reduce(
         (text, [key, val]) => text.replaceAll(key, val),
@@ -48,10 +35,4 @@ function fillTemplate(template, data) {
     );
 }
 
-userInput.addEventListener('keydown', async function (e) {
-    if (e.key === 'Enter') {
-        handleUserInput();
-    }
-});
-
-sendButton.addEventListener('click', handleUserInput);
+initContratData();
