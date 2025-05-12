@@ -4,16 +4,27 @@ const sendButton = document.getElementById('sendButton');
 
 const firstMsgDelayMs = 500;
 const delayBeforeBotRespondsMs = 400;
-const typingDelayMs = 10;
-const docGenerationTimeMs = 2000;
+const typingDelayMs = 8;
+const docGenerationTimeMs = 1800;
 
 let processStep = 0;
+let frnsDataSubstep = 2; // commencer à 2
 let contratData = {}
+const d = new Date();
+const DDYY_Date = d.getDate() + "" + (d.getFullYear() - 2000);
 
 const promptFournisseurData = [
     "Veuillez saisir le nom du fournisseur :", // 0
     "Veuillez saisir le numéro du contrat :", // 1
-    "Veuillez saisir l'adresse du fournisseur :" // 2
+    "Veuillez saisir le code postal du fournisseur :", // 2
+    "Veuillez saisir la ville du fournisseur :", // 3
+    "Veuillez saisir l'adresse du fournisseur :", // 4
+    "Veuillez saisir la raison sociale du fournisseur :", // 5
+    "Veuillez saisir le capital du fournisseur :", // 6
+    "Veuillez saisir la ville d'immatriculation du fournisseur :", // 7
+    "Veuillez saisir le numéro RCS du fournisseur :", // 8
+    "Veuillez saisir le nom du représentant du fournisseur :", // 9
+    "Veuillez saisir la fonction du représentant du fournisseur :" // 10
 ];
 
 const responseMessages = [
@@ -22,14 +33,22 @@ const responseMessages = [
     "J'ai compris que vous souhaitez créer un contrat. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
         "• Nom du fournisseur\n" +
         "• Numéro du contrat\n" +
-        "• Adresse du fournisseur (rue, code postal, ville)\n",
+        "• Adresse du fournisseur (code postal, ville, rue)\n" +
+        "• Les informations juridiques (raison sociale, capital, numéro RCS et ville d'immatriculation)\n" +
+        "• Les informations du représentant de la société (nom et fonction)\n",
 
     "Confirmez-vous les informations suivantes ?\n" + // 2
         "• Numéro du contrat : NUM_CONTRAT\n" +
         "• Nom du fournisseur : NOM_FOURNISSEUR\n" +
         "• Adresse : ADR_FOURNISSEUR\n" +
         "• Code postal : CP_FOURNISSEUR\n" +
-        "• Ville : VILLE_FOURNISSEUR\n",
+        "• Ville : VILLE_FOURNISSEUR\n" +
+        "• Raison sociale : RS_FOURNISSEUR\n" +
+        "• Capital : CAPITAL_FOURNISSEUR\n" +
+        "• Ville immatriculation : IMMAT_FOURNISSEUR\n" +
+        "• Numéro RCS : RCS_FOURNISSEUR\n" +
+        "• Représentant : REPR_FOURNISSEUR\n" +
+        "• Fonction du représentant : FCT_REP_FOURNISSEUR\n",
 
     "Comment puis-je vous aider ?", // 3
     "Très bien, je vais générer votre contrat.", // 4
@@ -140,15 +159,83 @@ function computeResponse(userRequest) {
                     .replace('NUMRCS_FOURNISSEUR', dataAlliance.numRCS);
                 processStep = 3;
             } else {
-                AIResponse = promptFournisseurData[2];
+                AIResponse = promptFournisseurData[2]; // demande le code postal
                 processStep = 2;
             }
             break;
 
-        case 2: // saisie infos fournisseur (adresse)
-            contratData.adresseFrns = userRequest;
-            AIResponse = promptFournisseurData[1];
-            processStep = 4;
+        case 2: // saisie infos fournisseur (substeps 2 à 10)
+            switch (frnsDataSubstep) {
+                // code postal
+                case 2:
+                    contratData.codePostalFrns = userRequest;
+                    AIResponse = promptFournisseurData[3]; // demande la ville
+                    frnsDataSubstep = 3;
+                    break;
+
+                // ville
+                case 3:
+                    contratData.villeFrns = userRequest;
+                    AIResponse = promptFournisseurData[4]; // demande la rue
+                    frnsDataSubstep = 4;
+                    break;
+
+                // rue
+                case 4:
+                    contratData.adresseFrns = userRequest;
+                    AIResponse = promptFournisseurData[5]; // demande la raison sociale
+                    frnsDataSubstep = 5;
+                    break;
+
+                // raison sociale
+                case 5:
+                    contratData.raisonSociale = userRequest;
+                    AIResponse = promptFournisseurData[6]; // demande le capital
+                    frnsDataSubstep = 6;
+                    break;
+
+                // capital
+                case 6:
+                    contratData.capitalFrns = userRequest;
+                    AIResponse = promptFournisseurData[7]; // demande la ville d'immat
+                    frnsDataSubstep =7;
+                    break;
+
+                // ville d'immatriculation
+                case 7:
+                    contratData.villeImmat = userRequest;
+                    AIResponse = promptFournisseurData[8]; // demande le num RCS
+                    frnsDataSubstep = 8;
+                    break;
+
+                // numéro RCS
+                case 8:
+                    contratData.numRCS = userRequest;
+                    AIResponse = promptFournisseurData[9]; // demande le nom du représentant
+                    frnsDataSubstep = 9;
+                    break;
+
+                // nom représentant
+                case 9:
+                    contratData.representantFrns = userRequest;
+                    AIResponse = promptFournisseurData[10]; // demande fonction représentant
+                    frnsDataSubstep = 10;
+                    break;
+
+                // fonction représentant
+                case 10:
+                    contratData.fonctionRepr = userRequest;
+                    AIResponse = promptFournisseurData[1]; // demande le numéro du contrat
+                    processStep = 4;
+                    frnsDataSubstep = 2;
+                    break;
+
+                default:
+                    AIResponse = responseMessages[0]; // "Je n'ai pas compris."
+                    processStep = 0;
+                    frnsDataSubstep = 2;
+                    break;
+            }
             break;
 
         // Le nom du fournisseur est connu, demande si on veut utiliser les données existantes
@@ -172,7 +259,14 @@ function computeResponse(userRequest) {
                 .replace('NOM_FOURNISSEUR', contratData.nomFrns)
                 .replace('ADR_FOURNISSEUR', contratData.adresseFrns)
                 .replace('CP_FOURNISSEUR', contratData.codePostalFrns)
-                .replace('VILLE_FOURNISSEUR', contratData.villeFrns);
+                .replace('VILLE_FOURNISSEUR', contratData.villeFrns)
+                .replace('RS_FOURNISSEUR', contratData.raisonSociale)
+                .replace('CAPITAL_FOURNISSEUR', contratData.capitalFrns)
+                .replace('IMMAT_FOURNISSEUR', contratData.villeImmat)
+                .replace('RCS_FOURNISSEUR', contratData.numRCS)
+                .replace('REPR_FOURNISSEUR', contratData.representantFrns)
+                .replace('FCT_REP_FOURNISSEUR', contratData.fonctionRepr)
+                ;
             processStep = 5;
             break;
 
@@ -186,6 +280,7 @@ function computeResponse(userRequest) {
                 initContratData();
                 AIResponse = "La création du contrat a été annulée.\n" + responseMessages[3];
                 processStep = 0;
+                frnsDataSubstep = 2;
             }
             break;
 
@@ -197,11 +292,14 @@ function computeResponse(userRequest) {
             } else {
                 AIResponse = responseMessages[3];
                 processStep = 0;
+                frnsDataSubstep = 2;
             }
             break;
 
         default:
             AIResponse = responseMessages[0]; // "Je n'ai pas compris."
+            processStep = 0;
+            frnsDataSubstep = 2;
             break;
     }
     return AIResponse;
@@ -249,12 +347,12 @@ async function handleUserInput() {
 
         // replace variable in template with user input
         doc.setData({
+            DDYY: DDYY_Date,
             NOM_FOURNISSEUR: contratData.nomFrns,
             NUM_CONTRAT: contratData.numContrat,
             ADR_FOURNISSEUR: contratData.adresseFrns,
             CP_FOURNISSEUR: contratData.codePostalFrns,
             VILLE_FOURNISSEUR: contratData.villeFrns,
-
             RS_FOURNISSEUR: contratData.raisonSociale,
             CAPITAL_FOURNISSEUR: contratData.capitalFrns,
             IMMAT_FOURNISSEUR: contratData.villeImmat,
