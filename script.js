@@ -2,55 +2,89 @@ const chat = document.getElementById('chat');
 const userInput = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
 
-let contratCreationStep = 0;
+const firstMsgDelayMs = 500;
+const delayBeforeBotRespondsMs = 400;
+const typingDelayMs = 10;
+const docGenerationTimeMs = 2000;
 
-/*
-creation steps :
-1 : ask for nom fournisseur
-2 : ask for num contrat
-3 : ask for adresse fournisseur
-4 : confirmation
-*/
+let processStep = 0;
+let contratData = {}
+
+const promptFournisseurData = [
+    "Veuillez saisir le nom du fournisseur :", // 0
+    "Veuillez saisir le numéro du contrat :", // 1
+    "Veuillez saisir l'adresse du fournisseur :" // 2
+];
 
 const responseMessages = [
-    "Je n'ai pas compris.",
+    "Je n'ai pas compris votre demande.", // 0
 
-    "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\n" +
+    "J'ai compris que vous souhaitez créer un contrat. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
         "• Nom du fournisseur\n" +
         "• Numéro du contrat\n" +
         "• Adresse du fournisseur\n",
 
-    "Veuillez saisir le nom du fournisseur :",
-    "Veuillez saisir le numéro du contrat :",
-    "Veuillez saisir l'adresse du fournisseur :",
+    "Confirmez-vous les informations suivantes ?\n" + // 2
+        "• Numéro du contrat : NUM_CONTRAT\n" +
+        "• Nom du fournisseur : NOM_FOURNISSEUR\n" +
+        "• Adresse du fournisseur : ADR_FOURNISSEUR\n",
 
-    "Confirmez-vous ces informations:\n" +
-        "Nom du fournisseur: NOM_FOURNISSEUR\n" +
-        "Numéro du contrat: NUM_CONTRAT\n" +
-        "Adresse du fournisseur: ADR_FOURNISSEUR ?",
+    "Comment puis-je vous aider ?", // 3
+    "Très bien, je vais générer votre contrat.", // 4
+    "Désirez-vous générer un autre contrat ?", // 5
 
-    "Comment puis-je vous aider ?",
-    "Je vais générer votre contrat."
+    "Le fournisseur NOM_FOURNISSEUR a été trouvé dans la base, souhaitez-vous utiliser les données suivantes ?\n" + // 6
+        "• Nom : NOM_FOURNISSEUR\n" +
+        "• Adresse : ADR_FOURNISSEUR\n" +
+        "• Code postal : CP_FOURNISSEUR\n" +
+        "• Ville : VILLE_FOURNISSEUR\n" +
+        "• Raison sociale : RS_FOURNISSEUR\n" +
+        "• Numéro RCS : NUMRCS_FOURNISSEUR\n"
 ];
 
-let contratData = {
-    nomFournisseur: null,
-    numContrat: null,
-    adrFournisseur: null,
-    validated: false
+const dataAlliance = {
+    nomFrns: 'Groupe Alliance',
+    adresseFrns: '7 rue Scribe',
+    codePostalFrns: '75009',
+    villeFrns: 'PARIS',
+    raisonSociale: 'SAS',
+    capitalFrns: '500000',
+    villeImmat: 'Nanterre',
+    numRCS: '504 729 286',
+    representantFrns: 'M.MALKA',
+    fonctionRepr: 'Président'
+}
+
+function initContratData() {
+    contratData.numContrat = null;
+    contratData.nomFrns = null;
+    contratData.adresseFrns = null;
+    contratData.codePostalFrns = null;
+    contratData.villeFrns = null;
+    contratData.raisonSociale = null;
+    contratData.capitalFrns = null;
+    contratData.villeImmat = null;
+    contratData.numRCS = null;
+    contratData.representantFrns = null;
+    contratData.fonctionRepr = null;
+    contratData.validated = false;
 }
 
 // Utility: simulate typing effect
-function typeMessage(text, className = 'ai', delay = 2) {
+function typeMessage(text, className = 'ai', delay = typingDelayMs) {
     return new Promise(resolve => {
         const messageEl = document.createElement('div');
         messageEl.className = `message ${className}`;
         chat.appendChild(messageEl);
+        chat.scrollTop = chat.scrollHeight;
         let i = 0;
 
         function typeChar() {
             if (i < text.length) {
                 messageEl.textContent += text[i++];
+                if (text[i] == '\n') {
+                    chat.scrollTop = chat.scrollHeight;
+                }
                 setTimeout(typeChar, delay);
             } else {
                 resolve();
@@ -65,9 +99,11 @@ function typeMessage(text, className = 'ai', delay = 2) {
 // Utility: delay
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+initContratData();
+
 // Initial greeting with typing effect
 window.addEventListener('DOMContentLoaded', async () => {
-    await wait(500);
+    await wait(firstMsgDelayMs);
     await typeMessage("Bonjour, comment puis-je vous aider ?");
     chat.scrollTop = chat.scrollHeight;
 });
@@ -76,52 +112,96 @@ userInput.addEventListener('input', () => {
     sendButton.disabled = userInput.value.trim() === '';
 });
 
-function isContratDataComplete() {
-    return contratData.nomFournisseur && contratData.numContrat && contratData.validated;
-}
-
 function computeResponse(userRequest) {
     let AIResponse;
+    let lowercaseUserRequest = userRequest.toLocaleLowerCase();
+    switch (processStep) {
+        case 0:
+            if (lowercaseUserRequest.includes('contrat')) {
+                AIResponse = responseMessages[1] + '\n' + promptFournisseurData[0];
+                processStep = 1;
+            } else {
+                AIResponse = responseMessages[0];
+            }
+            break;
 
-    console.log("step at begin of function : " + contratCreationStep);
+        // demande du nom du fournisseur
+        case 1: 
+            contratData.nomFrns = userRequest;
+            if (lowercaseUserRequest.includes('alliance')) {
+                AIResponse = responseMessages[6]
+                    .replaceAll('NOM_FOURNISSEUR', dataAlliance.nomFrns)
+                    .replace('ADR_FOURNISSEUR', dataAlliance.adresseFrns)
+                    .replace('CP_FOURNISSEUR', dataAlliance.codePostalFrns)
+                    .replace('VILLE_FOURNISSEUR', dataAlliance.villeFrns)
+                    .replace('RS_FOURNISSEUR', dataAlliance.raisonSociale)
+                    .replace('NUMRCS_FOURNISSEUR', dataAlliance.numRCS);
+                processStep = 3;
+            } else {
+                AIResponse = promptFournisseurData[2];
+                processStep = 2;
+            }
+            break;
 
-    lowercaseUserRequest = userRequest.toLocaleLowerCase();
+        case 2: // saisie infos fournisseur (adresse)
+            contratData.adresseFrns = userRequest;
+            AIResponse = promptFournisseurData[1];
+            processStep = 4;
+            break;
 
-    if (contratCreationStep == 0) {
-        if (lowercaseUserRequest.includes('contrat')) {
-            AIResponse = responseMessages[1] + '\n' + responseMessages[2];
-            contratCreationStep = 1;
-        } else {
-            AIResponse = responseMessages[0];
-        }
-    } else if (contratCreationStep == 1) {
-        AIResponse = responseMessages[3];
-        contratData.nomFournisseur = userRequest;
-        contratCreationStep = 2;
-    } else if (contratCreationStep == 2) {
-        contratData.numContrat = userRequest;
-        AIResponse = responseMessages[3];
-        contratCreationStep = 3;
-    } else if (contratCreationStep == 3) {
-        contratData.numContrat = userRequest;
-        AIResponse = responseMessages[4]
-            .replace('NOM_FOURNISSEUR', contratData.nomFournisseur)
-            .replace('NUM_CONTRAT', contratData.numContrat)
-            .replace('ADR_FOURNISSEUR', contratData.adrFournisseur);
-        contratCreationStep = 4;
-    } else if (contratCreationStep == 4) {
-        if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-            contratData.validated = true;
-            AIResponse = responseMessages[6];
-        } else {
-            contratData.nomFournisseur = null;
-            contratData.numContrat = null;
-            contratData.validated = false;
-            contratCreationStep = 0;
-            AIResponse = responseMessages[5];
-        }
+        // Le nom du fournisseur est connu, demande si on veut utiliser les données existantes
+        case 3: 
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                contratData = structuredClone(dataAlliance);
+                AIResponse = promptFournisseurData[1];
+                processStep = 4;
+            } else {
+                AIResponse = promptFournisseurData[2];
+                processStep = 2;
+            }
+            break;
+
+        
+        // demande du numéro de contrat
+        case 4:
+            contratData.numContrat = userRequest;
+            AIResponse = responseMessages[2]
+                .replace('NUM_CONTRAT', contratData.numContrat)
+                .replace('NOM_FOURNISSEUR', contratData.nomFrns)
+                .replace('ADR_FOURNISSEUR', contratData.adresseFrns)
+                .replace('CP_FOURNISSEUR', contratData.codePostalFrns)
+                .replace('VILLE_FOURNISSEUR', contratData.villeFrns);
+            processStep = 5;
+            break;
+
+        // demande de confirmation des infos
+        case 5:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                contratData.validated = true;
+                AIResponse = responseMessages[4]
+                processStep = 6;
+            } else {
+                initContratData();
+                AIResponse = "La création du contrat a été annulée.\n" + responseMessages[3];
+                processStep = 0;
+            }
+            break;
+
+        // Générer un autre contrat ?
+        case 6:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                AIResponse = promptFournisseurData[0]
+                processStep = 1;
+            } else {
+                AIResponse = responseMessages[3];
+                processStep = 0;
+            }
+            break;
+
+        default:
+            AIResponse = responseMessages[0]; // "Je n'ai pas compris."
+            break;
     }
-    console.log("step at end of function : " + contratCreationStep);
     return AIResponse;
 }
 
@@ -140,25 +220,12 @@ async function handleUserInput() {
     chat.scrollTop = chat.scrollHeight;
 
     // AI message
-    await wait(400); // short delay before bot responds
+    await wait(delayBeforeBotRespondsMs); // short delay before bot responds
     const AIMsg = computeResponse(userInputText);
     await typeMessage(AIMsg);
 
     // if all info has been filled, generate contrat
-    if (isContratDataComplete()) {
-        const response = await fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/main/template_contrat.docx');
-        const content = await response.arrayBuffer();
-
-        const zip = new PizZip(content);
-        const doc = new window.docxtemplater().loadZip(zip);
-        doc.setData({
-            NOM_FOURNISSEUR: contratData.nomFournisseur,
-            NUM_CONTRAT: contratData.numContrat,
-            ADR_FOURNISSEUR: contratData.adrFournisseur,
-        });
-        doc.render();
-        const out = doc.getZip().generate({ type: 'blob' });
-
+    if (contratData.validated) {
         // Show spinner
         const spinnerMessage = document.createElement('div');
         spinnerMessage.className = 'message ai';
@@ -172,31 +239,51 @@ async function handleUserInput() {
         chat.appendChild(spinnerMessage);
         chat.scrollTop = chat.scrollHeight;
 
-        await wait(1800); 
+        // get template file
+        const response = await fetch('https://raw.githubusercontent.com/flopif42/ia_assistant/main/template_contrat.docx');
+        const content = await response.arrayBuffer();
+        const zip = new PizZip(content);
+        const doc = new window.docxtemplater().loadZip(zip);
 
+        // replace variable in template with user input
+        doc.setData({
+            NOM_FOURNISSEUR: contratData.nomFrns,
+            NUM_CONTRAT: contratData.numContrat,
+            ADR_FOURNISSEUR: contratData.adresseFrns,
+            CP_FOURNISSEUR: contratData.codePostalFrns,
+            VILLE_FOURNISSEUR: contratData.villeFrns,
+        });
+        doc.render();
+        const out = doc.getZip().generate({ type: 'blob' });
+
+        // fake some waiting
+        await wait(docGenerationTimeMs); 
         spinnerMessage.remove();
 
+        // display result
         msg = "Votre document est prêt à être téléchargé.";
         await typeMessage(msg);
 
-        const documentDownload = document.createElement('div');
-        documentDownload.innerHTML = 'Votre contrat est prêt :';
-
+//        const documentDownload = document.createElement('div');
+//        documentDownload.innerHTML = 'Votre contrat est prêt :';
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(out);
-        downloadLink.download = 'contrat_generé.docx';
+        downloadLink.download = 'contrat_' + contratData.nomFrns + '.docx';
         downloadLink.textContent = '📄 Télécharger le contrat';
         downloadLink.style.display = 'inline-block';
         downloadLink.style.marginTop = '0.5em';
         downloadLink.style.textDecoration = 'none';
         downloadLink.style.color = '#0056d2';
         downloadLink.style.fontWeight = 'bold';
-
         const aiLinkMsg = document.createElement('div');
         aiLinkMsg.className = 'message ai';
         aiLinkMsg.appendChild(downloadLink);
         chat.appendChild(aiLinkMsg);
         chat.scrollTop = chat.scrollHeight;
+
+        // reinitialize data
+        initContratData();
+        await typeMessage(responseMessages[5]);  // "générer un autre contrat ?"
     }
 }
 
