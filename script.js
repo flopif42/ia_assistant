@@ -85,8 +85,8 @@ function computeResponse(userRequest) {
         contratData.nomFournisseur = userRequest;
         contratCreationStep = 2;
     } else if (contratCreationStep == 2) {
-        AIResponse = responseMessages[4].replace('NOM_FOURNISSEUR', contratData.nomFournisseur).replace('NUM_CONTRAT', contratData.numContrat);
         contratData.numContrat = userRequest;
+        AIResponse = responseMessages[4].replace('NOM_FOURNISSEUR', contratData.nomFournisseur).replace('NUM_CONTRAT', contratData.numContrat);
         contratCreationStep = 3;
     } else if (contratCreationStep == 3) {
         if (lowercaseUserRequest.includes('oui')) {
