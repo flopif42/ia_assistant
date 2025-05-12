@@ -8,15 +8,27 @@ let contratCreationStep = 0;
 creation steps :
 1 : ask for nom fournisseur
 2 : ask for num contrat
-3 : confirmation
+3 : ask for adresse fournisseur
+4 : confirmation
 */
 
 const responseMessages = [
     "Je n'ai pas compris.",
-    "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\n• Nom du fournisseur\n• Numéro du contrat",
-    "Veuillez saisir le nom du fournisseur:",
-    "Veuillez saisir le numéro du contrat:",
-    "Confirmez-vous ces informations:\nNom du fournisseur: NOM_FOURNISSEUR\nNuméro du contrat: NUM_CONTRAT ?",
+
+    "D'accord je vais vous aider à créer un contrat. J'ai besoin des informations suivantes :\n" +
+        "• Nom du fournisseur\n" +
+        "• Numéro du contrat\n" +
+        "• Adresse du fournisseur\n",
+
+    "Veuillez saisir le nom du fournisseur :",
+    "Veuillez saisir le numéro du contrat :",
+    "Veuillez saisir l'adresse du fournisseur :",
+
+    "Confirmez-vous ces informations:\n" +
+        "Nom du fournisseur: NOM_FOURNISSEUR\n" +
+        "Numéro du contrat: NUM_CONTRAT\n" +
+        "Adresse du fournisseur: ADR_FOURNISSEUR ?",
+
     "Comment puis-je vous aider ?",
     "Je vais générer votre contrat."
 ];
@@ -24,6 +36,7 @@ const responseMessages = [
 let contratData = {
     nomFournisseur: null,
     numContrat: null,
+    adrFournisseur: null,
     validated: false
 }
 
@@ -87,9 +100,16 @@ function computeResponse(userRequest) {
         contratCreationStep = 2;
     } else if (contratCreationStep == 2) {
         contratData.numContrat = userRequest;
-        AIResponse = responseMessages[4].replace('NOM_FOURNISSEUR', contratData.nomFournisseur).replace('NUM_CONTRAT', contratData.numContrat);
+        AIResponse = responseMessages[3];
         contratCreationStep = 3;
     } else if (contratCreationStep == 3) {
+        contratData.numContrat = userRequest;
+        AIResponse = responseMessages[4]
+            .replace('NOM_FOURNISSEUR', contratData.nomFournisseur)
+            .replace('NUM_CONTRAT', contratData.numContrat)
+            .replace('ADR_FOURNISSEUR', contratData.adrFournisseur);
+        contratCreationStep = 4;
+    } else if (contratCreationStep == 4) {
         if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
             contratData.validated = true;
             AIResponse = responseMessages[6];
@@ -133,7 +153,8 @@ async function handleUserInput() {
         const doc = new window.docxtemplater().loadZip(zip);
         doc.setData({
             NOM_FOURNISSEUR: contratData.nomFournisseur,
-            NUM_CONTRAT: contratData.numContrat
+            NUM_CONTRAT: contratData.numContrat,
+            ADR_FOURNISSEUR: contratData.adrFournisseur,
         });
         doc.render();
         const out = doc.getZip().generate({ type: 'blob' });
