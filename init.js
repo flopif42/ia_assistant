@@ -36,4 +36,4 @@ function fillTemplate(template, data) {
 }
 
 initContratData();
-document.getElementById("userInput").focus();
+userInput.focus();
