@@ -137,7 +137,7 @@ async function computeResponse(userRequest) {
                 // code postal
                 case 2:
                     if (!patternCP.test(userRequest)) {
-                        return responseMessages[9] + "\n" + promptFournisseurData[2]; "code postal invalide (syntaxe)"
+                        return responseMessages[9] + "\n" + promptFournisseurData[2]; // "code postal invalide (syntaxe)"
                     }
                     contratData.codePostalFrns = userRequest;
                     const guessedCity = await getCityFromPostalCode(userRequest);
@@ -154,7 +154,7 @@ async function computeResponse(userRequest) {
                 // ville
                 case 3:
                     if (!patternVille.test(userRequest)) {
-                        return responseMessages[13] + "\n" + promptFournisseurData[3]; "nom de ville invalide"
+                        return responseMessages[13] + "\n" + promptFournisseurData[3]; // "nom de ville invalide"
                     }
                     contratData.villeFrns = userRequest;
                     AIResponse = promptFournisseurData[4]; // demande la rue
@@ -181,7 +181,7 @@ async function computeResponse(userRequest) {
                 // capital
                 case 6:
                     if (!patternCapital.test(userRequest.replaceAll(".", "").replaceAll(",", ""))) {
-                        return responseMessages[11] + "\n" + promptFournisseurData[6]; "capital (montant) invalide"
+                        return responseMessages[11] + "\n" + promptFournisseurData[6]; // "capital (montant) invalide"
                     }
                     contratData.capitalFrns = userRequest;
                     AIResponse = promptFournisseurData[7]; // demande la ville d'immat
@@ -191,7 +191,7 @@ async function computeResponse(userRequest) {
                 // ville d'immatriculation
                 case 7:
                     if (!patternVille.test(userRequest)) {
-                        return responseMessages[13] + "\n" + promptFournisseurData[7]; "nom de ville invalide"
+                        return responseMessages[13] + "\n" + promptFournisseurData[7]; // "nom de ville invalide"
                     }
                     contratData.villeImmat = userRequest;
                     AIResponse = promptFournisseurData[8]; // demande le num SIREN
@@ -201,7 +201,7 @@ async function computeResponse(userRequest) {
                 // numéro RCS / Siren
                 case 8:
                     if (!patternSiren.test(userRequest.replaceAll(" ", ""))) {
-                        return responseMessages[12] + "\n" + promptFournisseurData[8]; "num SIREN invalide"
+                        return responseMessages[12] + "\n" + promptFournisseurData[8]; // "num SIREN invalide"
                     }
                     contratData.numRCS = 'RCS ' + contratData.villeImmat + ' B ' + userRequest;
                     AIResponse = promptFournisseurData[9]; // demande le nom du représentant
