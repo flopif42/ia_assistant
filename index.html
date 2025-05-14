@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Assistant IA</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="https://www.groupealliance.eu/media/templates/site/ga2024/images/favicon.ico" type="image/x-icon" />
   <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.8/dist/pizzip.min.js"></script>
   <script src="https://unpkg.com/docxtemplater@3.32.3/build/docxtemplater.js"></script>
   <style>
@@ -16,10 +17,11 @@
   </style>
 </head>
 <body>
+    <header id="appHeader">
+        <img src="https://www.groupealliance.eu/media/templates/site/ga2024/images/logo.png" alt="Groupe Alliance" id="companyLogo" />
+    </header>
   <div id="main">
-    <div id="chat">
-<!--      <div class="message ai">Bonjour, quel est le nom du fournisseur ?</div> -->
-    </div>
+    <div id="chat"></div>
     <div id="inputBox">
       <input type="text" id="userInput" placeholder="Entrez un message ..."/>
       <button id="sendButton" disabled>

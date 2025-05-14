@@ -1,75 +1,112 @@
-const promptFournisseurData = [
-    "Veuillez saisir le <strong>nom</strong> 🏦 du fournisseur :", // 0
-    "Veuillez saisir le <strong>numéro du contrat</strong> 📝 :", // 1
-    "Veuillez saisir le <strong>code postal</strong> du fournisseur :", // 2
-    "Veuillez saisir la <strong>ville</strong> du fournisseur :", // 3
-    "Veuillez saisir l'<strong>adresse</strong> 📍 du fournisseur :", // 4
-    "Veuillez saisir la <strong>raison sociale</strong> 🏢 du fournisseur :", // 5
-    "Veuillez saisir le <strong>capital</strong> 💶 du fournisseur :", // 6
-    "Veuillez saisir la <strong>ville d'immatriculation</strong> du fournisseur :", // 7
-    "Veuillez saisir le <strong>numéro SIREN</strong> du fournisseur :", // 8
-    "Veuillez saisir le <strong>nom du représentant</strong> du fournisseur :", // 9
-    "Veuillez saisir la <strong>fonction</strong> du représentant 👨‍💼 du fournisseur :" // 10
+const promptEmetteurData = [
+    "Merci de saisir le <strong>nom</strong> 🏦 du entity :" // 0
 ];
 
-const infosRecap = "<strong>NOM_FOURNISSEUR</strong>\n" +
-    "📍 ADR_FOURNISSEUR\n" +
-    "CP_FOURNISSEUR VILLE_FOURNISSEUR\n" +
-    "\n" +
-    "🏢 RS_FOURNISSEUR au capital de CAPITAL_FOURNISSEUR euros\n" +
-    "<strong>Numéro RCS</strong> : RCS IMMAT_FOURNISSEUR SIREN_FOURNISSEUR\n" +
-    "<strong>Représentant</strong> : REPR_FOURNISSEUR, FCT_REP_FOURNISSEUR";
+const promptentityData = [
+    "Merci de saisir le <strong>nom</strong> 🏦 du entity :", // 0
+    "Merci de saisir le <strong>numéro du contrat</strong> 📝 :", // 1
+    "Merci de saisir le <strong>code postal</strong> du entity :", // 2
+    "Merci de saisir la <strong>ville</strong> du entity :", // 3
+    "Merci de saisir l'<strong>adresse</strong> 📍 du entity :", // 4
+    "Merci de saisir la <strong>raison sociale</strong> 🏢 du entity :", // 5
+    "Merci de saisir le <strong>capital</strong> 💶 du entity :", // 6
+    "Merci de saisir la <strong>ville d'immatriculation</strong> du entity :", // 7
+    "Merci de saisir le <strong>numéro SIREN</strong> du entity :", // 8
+    "Merci de saisir le <strong>nom du représentant</strong> 👨‍💼 du entity :", // 9
+    "Merci de saisir la <strong>fonction</strong> du représentant du entity :" // 10
+];
+
+const infosRecap = "<strong>NOM_ENTITY</strong>\n" +
+    "📍 ADR_ENTITY\n" +
+    "CP_ENTITY VILLE_ENTITY\n" +
+    "🏢 RS_ENTITY au capital de CAPITAL_ENTITY euros\n" +
+    "n° RCS : RCS IMMAT_ENTITY SIREN_ENTITY\n" +
+    "Représentée par REPR_ENTITY, FCT_REP_ENTITY\n";
 
 const responseMessages = [
-    "Je n'ai pas compris votre demande.", // 0
+    "Je n'ai pas compris ta demande.", // 0
 
-    "J'ai compris que vous souhaitez créer un <strong>contrat</strong>. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
-        "🏦 Le <strong>nom</strong> du fournisseur\n" +
-        "📝 Le n° du <strong>contrat</strong>\n" +
-        "\n" + 
-        "S'il s'agit d'un nouveau fournisseur :\n" +
-        "📍 L'<strong>adresse</strong> (code postal, ville, rue)\n" +
-        "🏢 Les informations <strong>juridiques</strong> (raison sociale, capital, numéro SIREN et ville d'immatriculation)\n" +
-        "👨‍💼 Les informations du <strong>représentant</strong> de la société (nom et fonction)\n",
+    "J'ai compris que tu souhaites créer un <strong>contrat</strong>. Afin de pouvoir t'assister, j'aurais besoin des informations suivantes :\n" + // 1
+    "<strong><strong>1.</strong></strong> Quelle est l’entité émettrice du contrat ?",
 
-    "Confirmez-vous les informations suivantes ?\n" + // 2
-        "📝 <strong>N° du contrat</strong> : NUM_CONTRAT\n" +
-        "\n" +
-        infosRecap,
+    "📝 <strong>N° du contrat</strong> : NUM_CONTRAT de type <strong>Prestation de services</strong> entre d'une part :\n\n" + // 2
+    "INFOS_FOURNISSEUR\n" +
+    "Et d'autre part :\n\n" +
+    "INFOS_EMETTEUR\n" +
+    "Confirmes-tu l'exactitude de ces informations ?",
 
-    "Comment puis-je vous aider ?", // 3
-    "Très bien, je vais générer votre contrat.", // 4
-    "Désirez-vous générer un autre contrat ?", // 5
+    "Comment puis-je t'aider ?", // 3
+    "Très bien, je vais générer ton contrat.", // 4
+    "Désires-tu générer un autre contrat ?", // 5
 
-    "Le fournisseur <strong>NOM_FOURNISSEUR</strong> a été trouvé dans la base, souhaitez-vous utiliser les données suivantes ?\n" + // 6
-        infosRecap,
+    "L'entité <strong>NOM_ENTITY</strong> a été trouvée dans la base avec les informations suivantes :\n" + // 6
+    infosRecap + "\n" +
+    "Souhaites-tu utiliser cette entité pour ROLE_ENTITY ?",
 
-    "Je n’ai pas pu trouver de ville pour ce code postal. Veuillez saisir le nom de la ville manuellement :", // 7
-    "La création du contrat a été annulée.\nComment puis-je vous aider ?", //8
+    "Je n’ai pas pu trouver de ville pour ce code postal. Merci de saisir le nom de la ville manuellement :", // 7
+    "La création du contrat a été annulée.\nComment puis-je t'aider ?", //8
     "❌ Cela ne semble pas être un code postal valide.", //9
     "❌ Cela ne semble pas être une raison sociale valide. Les différents types sont SA, SNC, SARL, EURL, SAS et SASU.", // 10
     "❌ Le montant saisi ne semble pas correct.", // 11
     "❌ Le numéro SIREN doit être composé de 9 chiffres.", // 12
     "❌ Cela ne semble pas être un nom de ville valide.", //13
-    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. Souhaitez-vous utiliser le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> pour ce nouveau contrat ?", // 14
-    "✅ Très bien, je vais créer le nouveau contrat avec le numéro NUM_CONTRAT_PLUS_UN", // 15
-    "🤷 Je n'ai pas trouvé le fournisseur <strong>NOM_FOURNISSEUR</strong> dans la base. Nous allons donc enregistrer ce nouveau fournisseur.", // 16
-    "🎯 CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaitez-vous utiliser cette donnée ?" // 17
+    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. Souhaites-tu utiliser le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> pour ce nouveau contrat ?", // 14
+    "✅ Très bien, je vais créer le nouveau contrat avec le numéro NUM_CONTRAT_PLUS_UN.", // 15
+    "🤷 Je n'ai pas trouvé l'entité <strong>NOM_ENTITY</strong> dans la base. Veux-tu créer une nouvelle entité ?", // 16
+    "🎯 CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
+    "Je suis ton agent IA qui te permet de rédiger tes contrats, en quoi puis-je t'aider ?", // 18
+
+    "<strong><strong>2.</strong></strong> De quel <strong>type de contrat</strong> 📝 s'agit-il ? Les différents types sont :\n" + // 19
+    "<strong>1.</strong> Prestation de services\n" +
+    "<strong>2.</strong> Contrat cadre\n" +
+    "<strong>3.</strong> Contrat d’abonnement\n" +
+    "<strong>4.</strong> Contrat de collaboration ou de partenariat",
+
+    "❌ Je suis navré mais ce type de contrat n'est pas encore pris en charge.", // 20
+    "<strong><strong>3.</strong></strong> Quelle est l’entité fournisseur du contrat ?" // 21
 ];
 
-const dataAlliance = {
-    nomFrns: 'Groupe Alliance',
-    adresseFrns: '7 rue Scribe',
-    codePostalFrns: '75009',
-    villeFrns: 'PARIS',
-    raisonSociale: 'SAS',
-    capitalFrns: '500.000',
-    villeImmat: 'Nanterre',
-    numSIREN: '504 729 286',
-    representantFrns: 'M. Michael MALKA',
-    fonctionRepr: 'Président',
-    maxNumContrat: 41
-}
+const entities = [
+    {
+        nom: 'Groupe Alliance',
+        adresse: '7 rue Scribe',
+        codePostal: '75009',
+        ville: 'Paris',
+        raisonSociale: 'SAS',
+        capital: '500.000',
+        villeImmat: 'Nanterre',
+        numSIREN: '504 729 286',
+        representant: 'Michael MALKA',
+        fonctionRepr: 'Président',
+        maxNumContrat: 41
+    },
+    {
+        nom: 'Capgemini',
+        adresse: '145-151 Quai du Président Roosevelt',
+        codePostal: '92130',
+        ville: 'Issy-les-Moulineaux',
+        raisonSociale: 'SARL',
+        capital: '30.000.000.000',
+        villeImmat: 'Nanterre',
+        numSIREN: '328 781 786',
+        representant: 'Aiman Ezzat',
+        fonctionRepr: 'Directeur général',
+        maxNumContrat: 85419
+    },
+    {
+        nom: 'Spirica',
+        adresse: '31 rue Falguière',
+        codePostal: '75015',
+        ville: 'Paris',
+        raisonSociale: 'SA',
+        capital: '56.000.000',
+        villeImmat: 'Paris',
+        numSIREN: '487 739 963',
+        representant: 'Daniel COLLIGNON',
+        fonctionRepr: 'Directeur général',
+        maxNumContrat: 1390
+    }
+];
 
 const raisonsSociales = [
     'sa', 'snc', 'sarl', 'eurl', 'sas', 'sasu'
@@ -79,6 +116,48 @@ const patternVille = /^[A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+$/;
 const patternCP = /^[0-9]{5}$/;
 const patternCapital = /^[0-9]+$/;
 const patternSiren = /^[0-9]{9}$/;
+
+function getConfirmationMsg() {
+    let emetteur = contrat.emetteur;
+    let infosEmetteur = fillTemplate(infosRecap, {
+        NOM_ENTITY: emetteur.nom,
+        ADR_ENTITY: emetteur.adresse,
+        CP_ENTITY: emetteur.codePostal,
+        VILLE_ENTITY: emetteur.ville,
+        RS_ENTITY: emetteur.raisonSociale,
+        CAPITAL_ENTITY: emetteur.capital,
+        IMMAT_ENTITY: emetteur.villeImmat,
+        SIREN_ENTITY: emetteur.numSIREN,
+        REPR_ENTITY: emetteur.representant,
+        FCT_REP_ENTITY: emetteur.fonctionRepr
+    });
+
+    let fournisseur = contrat.fournisseur;
+    let infosFournisseur = fillTemplate(infosRecap, {
+        NOM_ENTITY: fournisseur.nom,
+        ADR_ENTITY: fournisseur.adresse,
+        CP_ENTITY: fournisseur.codePostal,
+        VILLE_ENTITY: fournisseur.ville,
+        RS_ENTITY: fournisseur.raisonSociale,
+        CAPITAL_ENTITY: fournisseur.capital,
+        IMMAT_ENTITY: fournisseur.villeImmat,
+        SIREN_ENTITY: fournisseur.numSIREN,
+        REPR_ENTITY: fournisseur.representant,
+        FCT_REP_ENTITY: fournisseur.fonctionRepr
+    });
+
+    return fillTemplate(responseMessages[2], {  // message de confirmation
+        NUM_CONTRAT: contrat.numContrat,
+        INFOS_EMETTEUR: infosEmetteur,
+        INFOS_FOURNISSEUR: infosFournisseur
+    })
+}
+
+
+function getEntity(keyword) {
+    keyword = keyword.toLowerCase();
+    return entities.find(entity => entity.nom.toLowerCase().includes(keyword));
+}
 
 async function getCityFromPostalCode(cp) {
     try {
@@ -97,57 +176,60 @@ async function computeResponse(userRequest) {
     let AIResponse;
     let lowercaseUserRequest = userRequest.toLocaleLowerCase();
 
+    // Pour annuler la saisie en cours
     if (lowercaseUserRequest.includes('annul')) {
-        initContratData();
+        initAll();
         AIResponse = responseMessages[8];
         processStep = 0;
-        frnsDataSubstep = 2;
+        entityCreationSubstep = 2;
         return AIResponse;
     }
 
     switch (processStep) {
         case 0:
             if (lowercaseUserRequest.includes('contrat')) {
-                AIResponse = responseMessages[1] + '\n' + promptFournisseurData[0];
+                AIResponse = responseMessages[1]; // entité émettrice ?
                 processStep = 1;
             } else {
                 AIResponse = responseMessages[0];
             }
             break;
 
-        // demande du nom du fournisseur
+        // demande du nom du entity émetteur
         case 1:
-            contratData.nomFrns = userRequest;
-            if (lowercaseUserRequest.includes('alliance')) {
-                AIResponse = responseMessages[6]
-                    .replaceAll('NOM_FOURNISSEUR', dataAlliance.nomFrns)
-                    .replace('ADR_FOURNISSEUR', dataAlliance.adresseFrns)
-                    .replace('CP_FOURNISSEUR', dataAlliance.codePostalFrns)
-                    .replace('VILLE_FOURNISSEUR', dataAlliance.villeFrns)
-                    .replace('RS_FOURNISSEUR', dataAlliance.raisonSociale)
-                    .replace('CAPITAL_FOURNISSEUR', dataAlliance.capitalFrns)
-                    .replace('IMMAT_FOURNISSEUR', dataAlliance.villeImmat)
-                    .replace('SIREN_FOURNISSEUR', dataAlliance.numSIREN)
-                    .replace('REPR_FOURNISSEUR', dataAlliance.representantFrns)
-                    .replace('FCT_REP_FOURNISSEUR', dataAlliance.fonctionRepr)
+            // entity.nom = userRequest;
+            entity = getEntity(userRequest);
+            if (entity) {
+                AIResponse = responseMessages[6] // entité trouvée, utiliser les données pour l'émetteur ?
+                    .replaceAll('NOM_ENTITY', entity.nom)
+                    .replace('ADR_ENTITY', entity.adresse)
+                    .replace('CP_ENTITY', entity.codePostal)
+                    .replace('VILLE_ENTITY', entity.ville)
+                    .replace('RS_ENTITY', entity.raisonSociale)
+                    .replace('CAPITAL_ENTITY', entity.capital)
+                    .replace('IMMAT_ENTITY', entity.villeImmat)
+                    .replace('SIREN_ENTITY', entity.numSIREN)
+                    .replace('REPR_ENTITY', entity.representant)
+                    .replace('FCT_REP_ENTITY', entity.fonctionRepr)
+                    .replace('ROLE_ENTITY', "l'émetteur")
                 processStep = 3;
             } else {
-                AIResponse = responseMessages[16].replace('NOM_FOURNISSEUR', userRequest) + "\n" + promptFournisseurData[2]; // demande le code postal
+                AIResponse = responseMessages[16].replace('NOM_ENTITY', userRequest) + "\n" + promptentityData[2]; // demande le code postal
                 processStep = 2;
             }
             break;
 
-        case 2: // saisie infos fournisseur (substeps 2 à 10)
-            switch (frnsDataSubstep) {
+        case 2: // saisie infos entity (substeps 2 à 10)
+            switch (entityCreationSubstep) {
                 // code postal
                 case 2:
                     if (!patternCP.test(userRequest)) {
-                        return responseMessages[9] + "\n" + promptFournisseurData[2]; // "code postal invalide (syntaxe)"
+                        return responseMessages[9] + "\n" + promptentityData[2]; // "code postal invalide (syntaxe)"
                     }
-                    contratData.codePostalFrns = userRequest;
+                    entity.codePostal = userRequest;
                     const guessedCity = await getCityFromPostalCode(userRequest);
                     if (guessedCity) {
-                        contratData.villeFrns = guessedCity;
+                        entity.villeFrns = guessedCity;
                         AIResponse = responseMessages[17]  // ville trouvée, utiliser l'info ?
                             .replace("CODE_POSTAL", userRequest)
                             .replace("GUESSED_CITY", guessedCity)
@@ -155,116 +237,156 @@ async function computeResponse(userRequest) {
                         processStep = 99; 
                     } else {
                         AIResponse = responseMessages[7]; // demande la ville
-                        frnsDataSubstep = 3;
+                        entityCreationSubstep = 3;
                     }
                     break;
 
                 // ville
                 case 3:
                     if (!patternVille.test(userRequest)) {
-                        return responseMessages[13] + "\n" + promptFournisseurData[3]; // "nom de ville invalide"
+                        return responseMessages[13] + "\n" + promptentityData[3]; // "nom de ville invalide"
                     }
-                    contratData.villeFrns = userRequest;
-                    AIResponse = promptFournisseurData[4]; // demande la rue
-                    frnsDataSubstep = 4;
+                    entity.ville = userRequest;
+                    AIResponse = promptentityData[4]; // demande la rue
+                    entityCreationSubstep = 4;
                     break;
 
                 // rue
                 case 4:
-                    contratData.adresseFrns = userRequest;
-                    AIResponse = promptFournisseurData[5]; // demande la raison sociale
-                    frnsDataSubstep = 5;
+                    entity.adresse = userRequest;
+                    AIResponse = promptentityData[5]; // demande la raison sociale
+                    entityCreationSubstep = 5;
                     break;
 
                 // raison sociale
                 case 5:
                     if (raisonsSociales.indexOf(lowercaseUserRequest.replaceAll(".", "")) == -1) {
-                        return responseMessages[10] + "\n" + promptFournisseurData[5]; // "raison sociale invalide"
+                        return responseMessages[10] + "\n" + promptentityData[5]; // "raison sociale invalide"
                     }
-                    contratData.raisonSociale = userRequest;
-                    AIResponse = promptFournisseurData[6]; // demande le capital
-                    frnsDataSubstep = 6;
+                    entity.raisonSociale = userRequest;
+                    AIResponse = promptentityData[6]; // demande le capital
+                    entityCreationSubstep = 6;
                     break;
 
                 // capital
                 case 6:
                     if (!patternCapital.test(userRequest.replaceAll(".", "").replaceAll(",", ""))) {
-                        return responseMessages[11] + "\n" + promptFournisseurData[6]; // "capital (montant) invalide"
+                        return responseMessages[11] + "\n" + promptentityData[6]; // "capital (montant) invalide"
                     }
-                    contratData.capitalFrns = userRequest;
-                    AIResponse = promptFournisseurData[7]; // demande la ville d'immat
-                    frnsDataSubstep = 7;
+                    entity.capital = userRequest;
+                    AIResponse = promptentityData[7]; // demande la ville d'immat
+                    entityCreationSubstep = 7;
                     break;
 
                 // ville d'immatriculation
                 case 7:
                     if (!patternVille.test(userRequest)) {
-                        return responseMessages[13] + "\n" + promptFournisseurData[7]; // "nom de ville invalide"
+                        return responseMessages[13] + "\n" + promptentityData[7]; // "nom de ville invalide"
                     }
-                    contratData.villeImmat = userRequest;
-                    AIResponse = promptFournisseurData[8]; // demande le num SIREN
-                    frnsDataSubstep = 8;
+                    entity.villeImmat = userRequest;
+                    AIResponse = promptentityData[8]; // demande le num SIREN
+                    entityCreationSubstep = 8;
                     break;
 
                 // numéro Siren
                 case 8:
                     if (!patternSiren.test(userRequest.replaceAll(" ", ""))) {
-                        return responseMessages[12] + "\n" + promptFournisseurData[8]; // "num SIREN invalide"
+                        return responseMessages[12] + "\n" + promptentityData[8]; // "num SIREN invalide"
                     }
-                    contratData.numSIREN = userRequest;
-                    AIResponse = promptFournisseurData[9]; // demande le nom du représentant
-                    frnsDataSubstep = 9;
+                    entity.numSIREN = userRequest.substring(0, 3) + " " + userRequest.substring(3, 6) + " " + userRequest.substring(6);
+                    AIResponse = promptentityData[9]; // demande le nom du représentant
+                    entityCreationSubstep = 9;
                     break;
 
                 // nom représentant
                 case 9:
-                    contratData.representantFrns = userRequest;
-                    AIResponse = promptFournisseurData[10]; // demande fonction représentant
-                    frnsDataSubstep = 10;
+                    entity.representant = userRequest;
+                    AIResponse = promptentityData[10]; // demande fonction représentant
+                    entityCreationSubstep = 10;
                     break;
 
                 // fonction représentant
                 case 10:
-                    contratData.fonctionRepr = userRequest;
-                    AIResponse = promptFournisseurData[1]; // demande le numéro du contrat
+                    entity.fonctionRepr = userRequest;
+                    AIResponse = promptentityData[1]; // demande le numéro du contrat
                     processStep = 4;
-                    frnsDataSubstep = 2;
+                    entityCreationSubstep = 2;
                     break;
 
                 default:
                     AIResponse = responseMessages[0]; // "Je n'ai pas compris."
                     processStep = 0;
-                    frnsDataSubstep = 2;
+                    entityCreationSubstep = 2;
                     break;
             }
             break;
 
-        // Le nom du fournisseur est connu, demande si on veut utiliser les données existantes
+        // Le nom du entity est connu, demande si on veut utiliser les données existantes comme émetteur
         case 3:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                contratData = structuredClone(dataAlliance);
-                // dans le cas d'un fournisseur existant, demander si on veut utiliser maxNumContrat +1 comme numéro de contrat
-                AIResponse = responseMessages[14]
-                    .replace("MAX_NUM_CONTRAT", contratData.maxNumContrat)
-                    .replace("NUM_CONTRAT_PLUS_UN", contratData.maxNumContrat + 1);
-                processStep = 31;
+                contrat.emetteur = entity;
+
+                AIResponse = responseMessages[19] // demande le type de contrat
+                processStep = 10;
             } else {
-                AIResponse = promptFournisseurData[2];
+                AIResponse = promptentityData[2];
                 processStep = 2;
+            }
+            break;
+
+        // type de contrat
+        case 10:
+            if (userRequest.includes('1') || userRequest.includes('pres')) {
+                AIResponse = responseMessages[21] // demande entité fournisseur
+                processStep = 11;
+            } else {
+                AIResponse = responseMessages[20] + "\n" + responseMessages[19]  // désolé, type de contrat non pris en charge
+            }
+            break;
+
+        // demande l'entité fournisseur
+        case 11:
+            //entity.nom = userRequest;
+            entity = getEntity(userRequest);
+            if (entity) {
+                AIResponse = responseMessages[6] // entité trouvée, utiliser les données (pour le fournisseur) ?
+                    .replaceAll('NOM_ENTITY', entity.nom)
+                    .replace('ADR_ENTITY', entity.adresse)
+                    .replace('CP_ENTITY', entity.codePostal)
+                    .replace('VILLE_ENTITY', entity.ville)
+                    .replace('RS_ENTITY', entity.raisonSociale)
+                    .replace('CAPITAL_ENTITY', entity.capital)
+                    .replace('IMMAT_ENTITY', entity.villeImmat)
+                    .replace('SIREN_ENTITY', entity.numSIREN)
+                    .replace('REPR_ENTITY', entity.representant)
+                    .replace('FCT_REP_ENTITY', entity.fonctionRepr)
+                    .replace('ROLE_ENTITY', "le fournisseur")
+                processStep = 12;
+            }
+            break;
+
+        // confirmation : utiliser les données trouvées pour le fournisseur ?
+        case 12:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                contrat.fournisseur = entity;
+                // dans le cas d'un entity existant, demander si on veut utiliser maxNumContrat +1 comme numéro de contrat
+                AIResponse = responseMessages[14]
+                    .replace("MAX_NUM_CONTRAT", entity.maxNumContrat)
+                    .replace("NUM_CONTRAT_PLUS_UN", entity.maxNumContrat + 1);
+                processStep = 31;
             }
             break;
 
         // confirmation : utiliser le num contrat +1
         case 31:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                AIResponse = responseMessages[15].replace("NUM_CONTRAT_PLUS_UN", contratData.maxNumContrat + 1);
-                contratData.numContrat = contratData.maxNumContrat + 1;
-
+                AIResponse = responseMessages[15].replace("NUM_CONTRAT_PLUS_UN", entity.maxNumContrat + 1);
+                contrat.numContrat = entity.maxNumContrat + 1;
                 // Confirmation des informations avant génération
                 AIResponse = AIResponse + "\n" + getConfirmationMsg();
                 processStep = 5;
             } else {
-                AIResponse = promptFournisseurData[1]; // demande le num contrat
+                AIResponse = promptentityData[1]; // demande le num contrat
                 processStep = 4;
             }
             break;
@@ -274,7 +396,7 @@ async function computeResponse(userRequest) {
             if (!isNaN(userRequest)) {
                 userRequest = parseInt(userRequest);
             }
-            contratData.numContrat = userRequest;
+            contrat.numContrat = userRequest;
             AIResponse = getConfirmationMsg();
             processStep = 5;
             break;
@@ -282,28 +404,28 @@ async function computeResponse(userRequest) {
         // demande de confirmation des infos
         case 5:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                contratData.validated = true;
+                contrat.validated = true;
                 AIResponse = responseMessages[4]
                 processStep = 6;
                 // Mettre à jour la valeur du dernier num contrat
-                dataAlliance.maxNumContrat = contratData.numContrat;
+                entity.maxNumContrat = contrat.numContrat;
             } else {
-                initContratData();
+                initAll();
                 AIResponse = responseMessages[8];
                 processStep = 0;
-                frnsDataSubstep = 2;
+                entityCreationSubstep = 2;
             }
             break;
 
         // Générer un autre contrat ?
         case 6:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                AIResponse = promptFournisseurData[0]
+                AIResponse = promptentityData[0]
                 processStep = 1;
             } else {
                 AIResponse = responseMessages[3];
                 processStep = 0;
-                frnsDataSubstep = 2;
+                entityCreationSubstep = 2;
             }
             break;
 
@@ -311,35 +433,20 @@ async function computeResponse(userRequest) {
         case 99:
             processStep = 2;
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                AIResponse = promptFournisseurData[4]; // demande adresse
-                frnsDataSubstep = 4;
+                AIResponse = promptentityData[4]; // demande adresse
+                entityCreationSubstep = 4;
             } else {
-                AIResponse = promptFournisseurData[3];
-                frnsDataSubstep = 3;
+                AIResponse = promptentityData[3];
+                entityCreationSubstep = 3;
             }
             break;
 
         default:
             AIResponse = responseMessages[0]; // "Je n'ai pas compris."
             processStep = 0;
-            frnsDataSubstep = 2;
+            entityCreationSubstep = 2;
             break;
     }
     return AIResponse;
 }
 
-function getConfirmationMsg() {
-    return fillTemplate(responseMessages[2], {  // message de confirmation
-        NUM_CONTRAT: contratData.numContrat,
-        NOM_FOURNISSEUR: contratData.nomFrns,
-        ADR_FOURNISSEUR: contratData.adresseFrns,
-        CP_FOURNISSEUR: contratData.codePostalFrns,
-        VILLE_FOURNISSEUR: contratData.villeFrns,
-        RS_FOURNISSEUR: contratData.raisonSociale,
-        CAPITAL_FOURNISSEUR: contratData.capitalFrns,
-        IMMAT_FOURNISSEUR: contratData.villeImmat,
-        SIREN_FOURNISSEUR: contratData.numSIREN,
-        REPR_FOURNISSEUR: contratData.representantFrns,
-        FCT_REP_FOURNISSEUR: contratData.fonctionRepr
-    })
-}

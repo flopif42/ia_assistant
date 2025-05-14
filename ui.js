@@ -89,7 +89,7 @@ async function handleUserInput() {
     await typeMessage(AIMsg);
 
     // if all info has been filled, generate contrat
-    if (contratData.validated) {
+    if (contrat.validated) {
         // Show spinner
         const spinnerMessage = document.createElement('div');
         spinnerMessage.className = 'message ai';
@@ -110,19 +110,36 @@ async function handleUserInput() {
         const doc = new window.docxtemplater().loadZip(zip);
 
         // replace variable in template with user input
+        emetteur = contrat.emetteur;
+        fournisseur = contrat.fournisseur;
+
         doc.setData({
             DDYY: DDYY_Date,
-            NOM_FOURNISSEUR: contratData.nomFrns,
-            NUM_CONTRAT: contratData.numContrat,
-            ADR_FOURNISSEUR: contratData.adresseFrns,
-            CP_FOURNISSEUR: contratData.codePostalFrns,
-            VILLE_FOURNISSEUR: contratData.villeFrns,
-            RS_FOURNISSEUR: contratData.raisonSociale,
-            CAPITAL_FOURNISSEUR: contratData.capitalFrns,
-            IMMAT_FOURNISSEUR: contratData.villeImmat,
-            RCS_FOURNISSEUR: "RCS " + contratData.villeImmat + " " + contratData.numSIREN,
-            REP_FOURNISSEUR: contratData.representantFrns,
-            FCT_REP_FOURNISSEUR: contratData.fonctionRepr
+            NUM_CONTRAT: contrat.numContrat,
+
+            // infos fournisseur
+            NOM_FOURNISSEUR: fournisseur.nom,
+            ADR_FOURNISSEUR: fournisseur.adresse,
+            CP_FOURNISSEUR: fournisseur.codePostal,
+            VILLE_FOURNISSEUR: fournisseur.ville,
+            RS_FOURNISSEUR: fournisseur.raisonSociale,
+            CAPITAL_FOURNISSEUR: fournisseur.capital,
+            IMMAT_FOURNISSEUR: fournisseur.villeImmat,
+            RCS_FOURNISSEUR: "RCS " + fournisseur.villeImmat + " " + fournisseur.numSIREN,
+            REP_FOURNISSEUR: fournisseur.representant,
+            FCT_REP_FOURNISSEUR: fournisseur.fonctionRepr,
+
+            // infos émetteur
+            NOM_EMETTEUR: emetteur.nom,
+            ADR_EMETTEUR: emetteur.adresse,
+            CP_EMETTEUR: emetteur.codePostal,
+            VILLE_EMETTEUR: emetteur.ville,
+            RS_EMETTEUR: emetteur.raisonSociale,
+            CAPITAL_EMETTEUR: emetteur.capital,
+            IMMAT_EMETTEUR: emetteur.villeImmat,
+            RCS_EMETTEUR: "RCS " + emetteur.villeImmat + " " + emetteur.numSIREN,
+            REP_EMETTEUR: emetteur.representant,
+            FCT_REP_EMETTEUR: emetteur.fonctionRepr
         });
         doc.render();
         const out = doc.getZip().generate({ type: 'blob' });
@@ -137,7 +154,7 @@ async function handleUserInput() {
 
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(out);
-        downloadLink.download = 'contrat_' + contratData.nomFrns + '.docx';
+        downloadLink.download = 'contrat_' + contrat.frns.nom + '_' + contrat.numContrat + '.docx';
         downloadLink.textContent = '📄 Télécharger le contrat';
         downloadLink.style.display = 'inline-block';
         downloadLink.style.marginTop = '0.5em';
@@ -151,7 +168,8 @@ async function handleUserInput() {
         chat.scrollTop = chat.scrollHeight;
 
         // reinitialize data
-        initContratData();
+        initContrat();
+        initentity();
         await typeMessage(responseMessages[5]);  // "générer un autre contrat ?"
     }
 }

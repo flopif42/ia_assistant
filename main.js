@@ -1,7 +1,7 @@
 // Initial greeting with typing effect
 window.addEventListener('DOMContentLoaded', async () => {
     await wait(firstMsgDelayMs);
-    await typeMessage("Bonjour, comment puis-je vous aider ?");
+    await typeMessage(responseMessages[18]); // bonjour
     chat.scrollTop = chat.scrollHeight;
 });
 
