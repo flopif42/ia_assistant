@@ -7,8 +7,40 @@ const delayBeforeBotRespondsMs = 400;
 const typingDelayMs = 1;
 const docGenerationTimeMs = 1800;
 
-let processStep = 0;
-let entityCreationSubstep = 1; // commencer à 1
+// PROMPT = ask for an information
+// CONFIRM = ask for confirmation (yes / no)
+const Step = {
+    BEGIN: 0,
+    PROMPT_EMETTEUR_ENTITY: 1,
+    CONFIRM_USE_EMETTEUR_ENTITY: 2,
+    CONFIRM_CREATE_ENTITY: 3,
+    PROMPT_CONTRAT_TYPE: 4,
+    PROMPT_FOURNISSEUR_ENTITY: 5,
+    CONFIRM_USE_FOURNISSEUR_ENTITY: 6,
+    CONFIRM_CONTRAT_DATA: 7,
+    CONFIRM_GENERATE_ANOTHER_CONTRAT: 8,
+    CREATE_ENTITY: 9,
+    PROMPT_NUM_CONTRAT: 10
+};
+
+const SubStep = {
+    PROMPT_NAME_ENTITY: 0,
+    PROMPT_ADRESSE_ENTITY: 1,
+    PROMPT_CP_ENTITY: 2,
+    CONFIRM_GUESSED_CITY: 3,
+    PROMPT_VILLE_ENTITY: 4,
+    PROMPT_RAISON_SOC_ENTITY: 5,
+    PROMPT_CAPITAL_ENTITY: 6,
+    PROMPT_VILLE_IMMAT: 7,
+    PROMPT_SIREN_ENTITY: 8,
+    PROMPT_REPR_ENTITY: 9,
+    PROMPT_FCT_REPR_ENTITY: 10,
+    CONFIRM_ENTITY_DATA: 11
+};
+
+let processStep = Step.BEGIN;
+let previousStep = null;
+let entityCreationSubstep = SubStep.PROMPT_NAME_ENTITY;
 
 let contrat = {}
 let entity;
