@@ -91,7 +91,7 @@ const entities = [
         capital: '30.000.000.000',
         villeImmat: 'Nanterre',
         numSIREN: '328 781 786',
-        representant: 'M. Aiman EZZAT',
+        representant: 'M. Aiman EZZATO',
         fonctionRepr: 'Directeur général',
         maxNumContrat: 85419
     },
