@@ -3,8 +3,8 @@ const userInput = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
 
 const firstMsgDelayMs = 500;
-const delayBeforeBotRespondsMs = 400;
-const typingDelayMs = 1;
+const delayBeforeBotRespondsMs = 900;
+const typingDelayMs = 9;
 const docGenerationTimeMs = 1800;
 
 // PROMPT = ask for an information

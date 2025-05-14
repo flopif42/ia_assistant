@@ -142,7 +142,8 @@ async function computeResponse(userRequest) {
                 responseMessages[15] // demande le type de contrat
             processStep = Step.PROMPT_CONTRAT_TYPE;
         } else {
-
+            AIResponse = responseMessages[24] + "\n" + responseMessages[25]; 
+            processStep = Step.PROMPT_EMETTEUR_ENTITY;
         }
         break;
         
@@ -210,7 +211,8 @@ async function computeResponse(userRequest) {
                     getConfirmationMsg();
                 processStep = Step.CONFIRM_CONTRAT_DATA;
             } else {
-
+                AIResponse = responseMessages[24] + "\n" + responseMessages[27]; 
+                processStep = Step.PROMPT_FOURNISSEUR_ENTITY;
             }
             break;
 
@@ -421,7 +423,7 @@ async function computeResponse(userRequest) {
             processStep = Step.BEGIN;
             break;
     }
-    console.log("current step : " + processStep + ", previous step : " + previousStep);
+    // console.log("current step : " + processStep + ", previous step : " + previousStep);
     return AIResponse;
 }
 
