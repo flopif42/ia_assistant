@@ -149,12 +149,12 @@ async function handleUserInput() {
         spinnerMessage.remove();
 
         // display result
-        msg = "✅ Votre document est prêt à être téléchargé.";
+        msg = "✅ Ton document est prêt à être téléchargé.";
         await typeMessage(msg);
 
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(out);
-        downloadLink.download = 'contrat_' + contrat.frns.nom + '_' + contrat.numContrat + '.docx';
+        downloadLink.download = 'contrat_' + contrat.fournisseur.nom + '_' + contrat.numContrat + '.docx';
         downloadLink.textContent = '📄 Télécharger le contrat';
         downloadLink.style.display = 'inline-block';
         downloadLink.style.marginTop = '0.5em';
@@ -168,8 +168,7 @@ async function handleUserInput() {
         chat.scrollTop = chat.scrollHeight;
 
         // reinitialize data
-        initContrat();
-        initentity();
+        initAll();
         await typeMessage(responseMessages[5]);  // "générer un autre contrat ?"
     }
 }

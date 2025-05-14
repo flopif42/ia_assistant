@@ -1,24 +1,20 @@
-const promptEmetteurData = [
-    "Merci de saisir le <strong>nom</strong> 🏦 du entity :" // 0
-];
-
 const promptentityData = [
-    "Merci de saisir le <strong>nom</strong> 🏦 du entity :", // 0
+    "Merci de saisir le <strong>nom</strong> 🏦 de l'entité :", // 0
     "Merci de saisir le <strong>numéro du contrat</strong> 📝 :", // 1
-    "Merci de saisir le <strong>code postal</strong> du entity :", // 2
-    "Merci de saisir la <strong>ville</strong> du entity :", // 3
-    "Merci de saisir l'<strong>adresse</strong> 📍 du entity :", // 4
-    "Merci de saisir la <strong>raison sociale</strong> 🏢 du entity :", // 5
-    "Merci de saisir le <strong>capital</strong> 💶 du entity :", // 6
-    "Merci de saisir la <strong>ville d'immatriculation</strong> du entity :", // 7
-    "Merci de saisir le <strong>numéro SIREN</strong> du entity :", // 8
-    "Merci de saisir le <strong>nom du représentant</strong> 👨‍💼 du entity :", // 9
-    "Merci de saisir la <strong>fonction</strong> du représentant du entity :" // 10
+    "Merci de saisir le <strong>code postal</strong> de l'entité :", // 2
+    "Merci de saisir la <strong>ville</strong> de l'entité :", // 3
+    "Merci de saisir l'<strong>adresse</strong> 📍 de l'entité :", // 4
+    "Merci de saisir la <strong>raison sociale</strong> 🏢 de l'entité :", // 5
+    "Merci de saisir le <strong>capital</strong> 💶 de l'entité :", // 6
+    "Merci de saisir la <strong>ville d'immatriculation</strong> de l'entité :", // 7
+    "Merci de saisir le <strong>numéro SIREN</strong> de l'entité :", // 8
+    "Merci de saisir le <strong>Le représentant</strong> 👨‍💼 de l'entité (civilité prénom NOM, par exemple : M. Jean MARTIN) :", // 9
+    "Merci de saisir la <strong>fonction</strong> du représentant de l'entité :" // 10
 ];
 
 const infosRecap = "<strong>NOM_ENTITY</strong>\n" +
     "📍 ADR_ENTITY\n" +
-    "CP_ENTITY VILLE_ENTITY\n" +
+    "CP_ENTITY VILLE_ENTITY\n\n" +
     "🏢 RS_ENTITY au capital de CAPITAL_ENTITY euros\n" +
     "n° RCS : RCS IMMAT_ENTITY SIREN_ENTITY\n" +
     "Représentée par REPR_ENTITY, FCT_REP_ENTITY\n";
@@ -39,9 +35,9 @@ const responseMessages = [
     "Très bien, je vais générer ton contrat.", // 4
     "Désires-tu générer un autre contrat ?", // 5
 
-    "L'entité <strong>NOM_ENTITY</strong> a été trouvée dans la base avec les informations suivantes :\n" + // 6
+    "L'entité NOM_ENTITY a été trouvée dans la base avec les informations suivantes :\n\n" + // 6
     infosRecap + "\n" +
-    "Souhaites-tu utiliser cette entité pour ROLE_ENTITY ?",
+    "Souhaites-tu l'utiliser en tant que ROLE_ENTITY ?",
 
     "Je n’ai pas pu trouver de ville pour ce code postal. Merci de saisir le nom de la ville manuellement :", // 7
     "La création du contrat a été annulée.\nComment puis-je t'aider ?", //8
@@ -53,7 +49,7 @@ const responseMessages = [
     "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. Souhaites-tu utiliser le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> pour ce nouveau contrat ?", // 14
     "✅ Très bien, je vais créer le nouveau contrat avec le numéro NUM_CONTRAT_PLUS_UN.", // 15
     "🤷 Je n'ai pas trouvé l'entité <strong>NOM_ENTITY</strong> dans la base. Veux-tu créer une nouvelle entité ?", // 16
-    "🎯 CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
+    "🎯 Le code postal CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
     "Je suis ton agent IA qui te permet de rédiger tes contrats, en quoi puis-je t'aider ?", // 18
 
     "<strong><strong>2.</strong></strong> De quel <strong>type de contrat</strong> 📝 s'agit-il ? Les différents types sont :\n" + // 19
@@ -63,7 +59,13 @@ const responseMessages = [
     "<strong>4.</strong> Contrat de collaboration ou de partenariat",
 
     "❌ Je suis navré mais ce type de contrat n'est pas encore pris en charge.", // 20
-    "<strong><strong>3.</strong></strong> Quelle est l’entité fournisseur du contrat ?" // 21
+    "<strong><strong>3.</strong></strong> Quelle est l’entité fournisseur du contrat ?", // 21
+
+    "Je m'apprête à créer une nouvelle entité avec les données suivantes :\n" + // 22
+    infosRecap + "\n" +
+    "Confirmes-tu l'exactitude de ces informations ?",
+
+    "✅ La nouvelle entité NOM_ENTITY a bien été créée." // 23
 ];
 
 const entities = [
@@ -76,7 +78,7 @@ const entities = [
         capital: '500.000',
         villeImmat: 'Nanterre',
         numSIREN: '504 729 286',
-        representant: 'Michael MALKA',
+        representant: 'M. Michael MALKA',
         fonctionRepr: 'Président',
         maxNumContrat: 41
     },
@@ -89,7 +91,7 @@ const entities = [
         capital: '30.000.000.000',
         villeImmat: 'Nanterre',
         numSIREN: '328 781 786',
-        representant: 'Aiman Ezzat',
+        representant: 'M. Aiman EZZAT',
         fonctionRepr: 'Directeur général',
         maxNumContrat: 85419
     },
@@ -102,7 +104,7 @@ const entities = [
         capital: '56.000.000',
         villeImmat: 'Paris',
         numSIREN: '487 739 963',
-        representant: 'Daniel COLLIGNON',
+        representant: 'M. Daniel COLLIGNON',
         fonctionRepr: 'Directeur général',
         maxNumContrat: 1390
     }
@@ -191,13 +193,12 @@ async function computeResponse(userRequest) {
                 AIResponse = responseMessages[1]; // entité émettrice ?
                 processStep = 1;
             } else {
-                AIResponse = responseMessages[0];
+                AIResponse = responseMessages[0]; //  je n'ai pas compris
             }
             break;
 
         // demande du nom du entity émetteur
         case 1:
-            // entity.nom = userRequest;
             entity = getEntity(userRequest);
             if (entity) {
                 AIResponse = responseMessages[6] // entité trouvée, utiliser les données pour l'émetteur ?
@@ -211,51 +212,68 @@ async function computeResponse(userRequest) {
                     .replace('SIREN_ENTITY', entity.numSIREN)
                     .replace('REPR_ENTITY', entity.representant)
                     .replace('FCT_REP_ENTITY', entity.fonctionRepr)
-                    .replace('ROLE_ENTITY', "l'émetteur")
+                    .replace('ROLE_ENTITY', "société émettrice")
                 processStep = 3;
             } else {
-                AIResponse = responseMessages[16].replace('NOM_ENTITY', userRequest) + "\n" + promptentityData[2]; // demande le code postal
+                AIResponse = responseMessages[16].replace('NOM_ENTITY', userRequest); // entité non trouvée, la créer
+                processStep = 40;
+            }
+            break;
+
+        // confirmation : création d'une nouvelle entité
+        case 40:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                AIResponse = promptentityData[0] // demande le nom de l'entité
                 processStep = 2;
+                entityCreationSubstep = 1;
+                entity = {};
+            } else {
+                AIResponse = "Erreur technique : TODO !"
             }
             break;
 
         case 2: // saisie infos entity (substeps 2 à 10)
             switch (entityCreationSubstep) {
-                // code postal
+                // nom
+                case 1:
+                    entity.nom = userRequest;
+                    AIResponse = promptentityData[4]; // demande la rue
+                    entityCreationSubstep = 2
+                    break;
+
+                // rue
                 case 2:
+                    entity.adresse = userRequest;
+                    AIResponse = promptentityData[2]; // demande le code postal
+                    entityCreationSubstep = 3;
+                    break;
+
+                // code postal
+                case 3:
                     if (!patternCP.test(userRequest)) {
                         return responseMessages[9] + "\n" + promptentityData[2]; // "code postal invalide (syntaxe)"
                     }
                     entity.codePostal = userRequest;
                     const guessedCity = await getCityFromPostalCode(userRequest);
                     if (guessedCity) {
-                        entity.villeFrns = guessedCity;
+                        entity.ville = guessedCity;
                         AIResponse = responseMessages[17]  // ville trouvée, utiliser l'info ?
                             .replace("CODE_POSTAL", userRequest)
-                            .replace("GUESSED_CITY", guessedCity)
-                            ; 
-                        processStep = 99; 
+                            .replace("GUESSED_CITY", guessedCity);
+                        processStep = 99;
                     } else {
-                        AIResponse = responseMessages[7]; // demande la ville
-                        entityCreationSubstep = 3;
+                        AIResponse = "Erreur technique : TODO !"
                     }
                     break;
 
                 // ville
-                case 3:
+                case 666:
                     if (!patternVille.test(userRequest)) {
                         return responseMessages[13] + "\n" + promptentityData[3]; // "nom de ville invalide"
                     }
                     entity.ville = userRequest;
                     AIResponse = promptentityData[4]; // demande la rue
                     entityCreationSubstep = 4;
-                    break;
-
-                // rue
-                case 4:
-                    entity.adresse = userRequest;
-                    AIResponse = promptentityData[5]; // demande la raison sociale
-                    entityCreationSubstep = 5;
                     break;
 
                 // raison sociale
@@ -308,11 +326,21 @@ async function computeResponse(userRequest) {
                 // fonction représentant
                 case 10:
                     entity.fonctionRepr = userRequest;
-                    AIResponse = promptentityData[1]; // demande le numéro du contrat
-                    processStep = 4;
-                    entityCreationSubstep = 2;
+                    AIResponse = responseMessages[22]
+                        .replaceAll('NOM_ENTITY', entity.nom)
+                        .replace('ADR_ENTITY', entity.adresse)
+                        .replace('CP_ENTITY', entity.codePostal)
+                        .replace('VILLE_ENTITY', entity.ville)
+                        .replace('RS_ENTITY', entity.raisonSociale)
+                        .replace('CAPITAL_ENTITY', entity.capital)
+                        .replace('IMMAT_ENTITY', entity.villeImmat)
+                        .replace('SIREN_ENTITY', entity.numSIREN)
+                        .replace('REPR_ENTITY', entity.representant)
+                        .replace('FCT_REP_ENTITY', entity.fonctionRepr); // confirmer les infos pour la création de l'entité ?
+                    processStep = 41;
                     break;
 
+                // erreur (ne devrait pas arriver ici)
                 default:
                     AIResponse = responseMessages[0]; // "Je n'ai pas compris."
                     processStep = 0;
@@ -321,11 +349,27 @@ async function computeResponse(userRequest) {
             }
             break;
 
+        // confirmer les infos de la création de l'entity
+        case 41:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                AIResponse = responseMessages[23] +  // nouvelle entity bien créée
+                    " Je vais l'utiliser comme émetteur.\n" +
+                    responseMessages[19]; // demande type de contrat
+
+                persistedEntity = structuredClone(entity);
+                entities.push(persistedEntity);
+
+                contrat.emetteur = persistedEntity;
+                processStep = 10;
+            } else {
+                AIResponse = "Erreur technique : TODO !";
+            }
+            break;
+
         // Le nom du entity est connu, demande si on veut utiliser les données existantes comme émetteur
         case 3:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
                 contrat.emetteur = entity;
-
                 AIResponse = responseMessages[19] // demande le type de contrat
                 processStep = 10;
             } else {
@@ -360,7 +404,7 @@ async function computeResponse(userRequest) {
                     .replace('SIREN_ENTITY', entity.numSIREN)
                     .replace('REPR_ENTITY', entity.representant)
                     .replace('FCT_REP_ENTITY', entity.fonctionRepr)
-                    .replace('ROLE_ENTITY', "le fournisseur")
+                    .replace('ROLE_ENTITY', "fournisseur")
                 processStep = 12;
             }
             break;
@@ -431,13 +475,12 @@ async function computeResponse(userRequest) {
 
         // confirmer l'utilisation de la ville retournée par l'API du gouv
         case 99:
-            processStep = 2;
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                AIResponse = promptentityData[4]; // demande adresse
-                entityCreationSubstep = 4;
+                AIResponse = promptentityData[5]; // demande raison sociale
+                entityCreationSubstep = 5;
+                processStep = 2;
             } else {
-                AIResponse = promptentityData[3];
-                entityCreationSubstep = 3;
+                AIResponse = "Erreur technique : TODO !"
             }
             break;
 

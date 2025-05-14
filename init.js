@@ -8,7 +8,7 @@ const typingDelayMs = 1;
 const docGenerationTimeMs = 1800;
 
 let processStep = 0;
-let entityCreationSubstep = 2; // commencer à 2
+let entityCreationSubstep = 1; // commencer à 1
 
 let contrat = {}
 let entity;
