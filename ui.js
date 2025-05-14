@@ -1,5 +1,47 @@
+function typeMessage(html, className = 'ai', delay = typingDelayMs) {
+    return new Promise(resolve => {
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${className}`;
+        chat.appendChild(messageEl);
+        chat.scrollTop = chat.scrollHeight;
+
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = html;
+
+        async function typeNode(node, container) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                for (let i = 0; i < text.length; i++) {
+                    container.append(text[i]);
+                    await wait(delay);
+                    chat.scrollTop = chat.scrollHeight;
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                const el = document.createElement(node.tagName);
+                // Copy attributes like <strong class="..."> if needed
+                for (let attr of node.attributes) {
+                    el.setAttribute(attr.name, attr.value);
+                }
+                container.appendChild(el);
+                for (let child of node.childNodes) {
+                    await typeNode(child, el);
+                }
+            }
+        }
+
+        (async () => {
+            for (let child of tempContainer.childNodes) {
+                await typeNode(child, messageEl);
+            }
+            resolve();
+        })();
+    });
+}
+
+
+
 // Utility: simulate typing effect
-function typeMessage(text, className = 'ai', delay = typingDelayMs) {
+function oldtypeMessage(text, className = 'ai', delay = typingDelayMs) {
     return new Promise(resolve => {
         const messageEl = document.createElement('div');
         messageEl.className = `message ${className}`;
@@ -78,7 +120,7 @@ async function handleUserInput() {
             RS_FOURNISSEUR: contratData.raisonSociale,
             CAPITAL_FOURNISSEUR: contratData.capitalFrns,
             IMMAT_FOURNISSEUR: contratData.villeImmat,
-            RCS_FOURNISSEUR: contratData.numRCS,
+            RCS_FOURNISSEUR: "RCS " + contratData.villeImmat + " " + contratData.numSIREN,
             REP_FOURNISSEUR: contratData.representantFrns,
             FCT_REP_FOURNISSEUR: contratData.fonctionRepr
         });
@@ -90,7 +132,7 @@ async function handleUserInput() {
         spinnerMessage.remove();
 
         // display result
-        msg = "Votre document est prêt à être téléchargé.";
+        msg = "✅ Votre document est prêt à être téléchargé.";
         await typeMessage(msg);
 
         const downloadLink = document.createElement('a');

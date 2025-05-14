@@ -4,7 +4,7 @@ const sendButton = document.getElementById('sendButton');
 
 const firstMsgDelayMs = 500;
 const delayBeforeBotRespondsMs = 400;
-const typingDelayMs = 8;
+const typingDelayMs = 5;
 const docGenerationTimeMs = 1800;
 
 let processStep = 0;
@@ -22,7 +22,7 @@ function initContratData() {
     contratData.raisonSociale = null;
     contratData.capitalFrns = null;
     contratData.villeImmat = null;
-    contratData.numRCS = null;
+    contratData.numSIREN = null;
     contratData.representantFrns = null;
     contratData.fonctionRepr = null;
     contratData.validated = false;

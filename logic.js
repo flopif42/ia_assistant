@@ -1,60 +1,60 @@
 const promptFournisseurData = [
-    "Veuillez saisir le nom du fournisseur :", // 0
-    "Veuillez saisir le numéro du contrat :", // 1
-    "Veuillez saisir le code postal du fournisseur :", // 2
-    "Veuillez saisir la ville du fournisseur :", // 3
-    "Veuillez saisir l'adresse du fournisseur :", // 4
-    "Veuillez saisir la raison sociale du fournisseur :", // 5
-    "Veuillez saisir le capital du fournisseur :", // 6
-    "Veuillez saisir la ville d'immatriculation du fournisseur :", // 7
-    "Veuillez saisir le numéro SIREN du fournisseur :", // 8
-    "Veuillez saisir le nom du représentant du fournisseur :", // 9
-    "Veuillez saisir la fonction du représentant du fournisseur :" // 10
+    "Veuillez saisir le <strong>nom</strong> 🏦 du fournisseur :", // 0
+    "Veuillez saisir le <strong>numéro du contrat</strong> 📝 :", // 1
+    "Veuillez saisir le <strong>code postal</strong> du fournisseur :", // 2
+    "Veuillez saisir la <strong>ville</strong> du fournisseur :", // 3
+    "Veuillez saisir l'<strong>adresse</strong> 📍 du fournisseur :", // 4
+    "Veuillez saisir la <strong>raison sociale</strong> 🏢 du fournisseur :", // 5
+    "Veuillez saisir le <strong>capital</strong> 💶 du fournisseur :", // 6
+    "Veuillez saisir la <strong>ville d'immatriculation</strong> du fournisseur :", // 7
+    "Veuillez saisir le <strong>numéro SIREN</strong> du fournisseur :", // 8
+    "Veuillez saisir le <strong>nom du représentant</strong> du fournisseur :", // 9
+    "Veuillez saisir la <strong>fonction</strong> du représentant 👨‍💼 du fournisseur :" // 10
 ];
+
+const infosRecap = "<strong>NOM_FOURNISSEUR</strong>\n" +
+    "📍 ADR_FOURNISSEUR\n" +
+    "CP_FOURNISSEUR VILLE_FOURNISSEUR\n" +
+    "\n" +
+    "🏢 RS_FOURNISSEUR au capital de CAPITAL_FOURNISSEUR euros\n" +
+    "<strong>Numéro RCS</strong> : RCS IMMAT_FOURNISSEUR SIREN_FOURNISSEUR\n" +
+    "<strong>Représentant</strong> : REPR_FOURNISSEUR, FCT_REP_FOURNISSEUR";
 
 const responseMessages = [
     "Je n'ai pas compris votre demande.", // 0
 
-    "J'ai compris que vous souhaitez créer un contrat. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
-        "• Nom du fournisseur\n" +
-        "• Numéro du contrat\n\n" +
-        "Dans le cas d'un nouveau fournisseur :\n" +
-        "• Adresse du fournisseur (code postal, ville, rue)\n" +
-        "• Les informations juridiques (raison sociale, capital, numéro RCS et ville d'immatriculation)\n" +
-        "• Les informations du représentant de la société (nom et fonction)\n",
+    "J'ai compris que vous souhaitez créer un <strong>contrat</strong>. Afin de pouvoir vous assister, j'aurais besoin des informations suivantes :\n" + // 1
+        "🏦 Le <strong>nom</strong> du fournisseur\n" +
+        "📝 Le n° du <strong>contrat</strong>\n" +
+        "\n" + 
+        "S'il s'agit d'un nouveau fournisseur :\n" +
+        "📍 L'<strong>adresse</strong> (code postal, ville, rue)\n" +
+        "🏢 Les informations <strong>juridiques</strong> (raison sociale, capital, numéro SIREN et ville d'immatriculation)\n" +
+        "👨‍💼 Les informations du <strong>représentant</strong> de la société (nom et fonction)\n",
 
     "Confirmez-vous les informations suivantes ?\n" + // 2
-        "• Numéro du contrat : NUM_CONTRAT\n" +
-        "• Nom du fournisseur : NOM_FOURNISSEUR\n" +
-        "• Adresse : ADR_FOURNISSEUR\n" +
-        "• Code postal : CP_FOURNISSEUR\n" +
-        "• Ville : VILLE_FOURNISSEUR\n" +
-        "• Raison sociale : RS_FOURNISSEUR\n" +
-        "• Capital : CAPITAL_FOURNISSEUR\n" +
-        "• Ville immatriculation : IMMAT_FOURNISSEUR\n" +
-        "• Numéro RCS : RCS_FOURNISSEUR\n" +
-        "• Représentant : REPR_FOURNISSEUR\n" +
-        "• Fonction du représentant : FCT_REP_FOURNISSEUR\n",
+        "📝 <strong>N° du contrat</strong> : NUM_CONTRAT\n" +
+        "\n" +
+        infosRecap,
 
     "Comment puis-je vous aider ?", // 3
     "Très bien, je vais générer votre contrat.", // 4
     "Désirez-vous générer un autre contrat ?", // 5
 
-    "Le fournisseur NOM_FOURNISSEUR a été trouvé dans la base, souhaitez-vous utiliser les données suivantes ?\n" + // 6
-        "• Nom : NOM_FOURNISSEUR\n" +
-        "• Adresse : ADR_FOURNISSEUR\n" +
-        "• Code postal : CP_FOURNISSEUR\n" +
-        "• Ville : VILLE_FOURNISSEUR\n" +
-        "• Raison sociale : RS_FOURNISSEUR\n" +
-        "• Numéro RCS : NUMRCS_FOURNISSEUR\n",
+    "Le fournisseur <strong>NOM_FOURNISSEUR</strong> a été trouvé dans la base, souhaitez-vous utiliser les données suivantes ?\n" + // 6
+        infosRecap,
 
     "Je n’ai pas pu trouver de ville pour ce code postal. Veuillez saisir le nom de la ville manuellement :", // 7
     "La création du contrat a été annulée.\nComment puis-je vous aider ?", //8
-    "Cela ne semble pas être un code postal valide.", //9
-    "Cela ne semble pas être une raison sociale valide. Les différents types sont SA, SNC, SARL, EURL, SAS et SASU.", // 10
-    "Le montant saisi ne semble pas correct.", // 11
-    "Le numéro SIREN doit être composé de 9 chiffres.", // 12
-    "Cela ne semble pas être un nom de ville valide." //13
+    "❌ Cela ne semble pas être un code postal valide.", //9
+    "❌ Cela ne semble pas être une raison sociale valide. Les différents types sont SA, SNC, SARL, EURL, SAS et SASU.", // 10
+    "❌ Le montant saisi ne semble pas correct.", // 11
+    "❌ Le numéro SIREN doit être composé de 9 chiffres.", // 12
+    "❌ Cela ne semble pas être un nom de ville valide.", //13
+    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. Souhaitez-vous utiliser le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> pour ce nouveau contrat ?", // 14
+    "✅ Très bien, je vais créer le nouveau contrat avec le numéro NUM_CONTRAT_PLUS_UN", // 15
+    "🤷 Je n'ai pas trouvé le fournisseur <strong>NOM_FOURNISSEUR</strong> dans la base. Nous allons donc enregistrer ce nouveau fournisseur.", // 16
+    "🎯 CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaitez-vous utiliser cette donnée ?" // 17
 ];
 
 const dataAlliance = {
@@ -65,9 +65,10 @@ const dataAlliance = {
     raisonSociale: 'SAS',
     capitalFrns: '500.000',
     villeImmat: 'Nanterre',
-    numRCS: '504 729 286',
+    numSIREN: '504 729 286',
     representantFrns: 'M. Michael MALKA',
-    fonctionRepr: 'Président'
+    fonctionRepr: 'Président',
+    maxNumContrat: 41
 }
 
 const raisonsSociales = [
@@ -124,10 +125,14 @@ async function computeResponse(userRequest) {
                     .replace('CP_FOURNISSEUR', dataAlliance.codePostalFrns)
                     .replace('VILLE_FOURNISSEUR', dataAlliance.villeFrns)
                     .replace('RS_FOURNISSEUR', dataAlliance.raisonSociale)
-                    .replace('NUMRCS_FOURNISSEUR', dataAlliance.numRCS);
+                    .replace('CAPITAL_FOURNISSEUR', dataAlliance.capitalFrns)
+                    .replace('IMMAT_FOURNISSEUR', dataAlliance.villeImmat)
+                    .replace('SIREN_FOURNISSEUR', dataAlliance.numSIREN)
+                    .replace('REPR_FOURNISSEUR', dataAlliance.representantFrns)
+                    .replace('FCT_REP_FOURNISSEUR', dataAlliance.fonctionRepr)
                 processStep = 3;
             } else {
-                AIResponse = promptFournisseurData[2]; // demande le code postal
+                AIResponse = responseMessages[16].replace('NOM_FOURNISSEUR', userRequest) + "\n" + promptFournisseurData[2]; // demande le code postal
                 processStep = 2;
             }
             break;
@@ -143,7 +148,10 @@ async function computeResponse(userRequest) {
                     const guessedCity = await getCityFromPostalCode(userRequest);
                     if (guessedCity) {
                         contratData.villeFrns = guessedCity;
-                        AIResponse = `${userRequest} correspond à la commune de ${guessedCity}. Souhaitez-vous utiliser cette donnée ?`;
+                        AIResponse = responseMessages[17]  // ville trouvée, utiliser l'info ?
+                            .replace("CODE_POSTAL", userRequest)
+                            .replace("GUESSED_CITY", guessedCity)
+                            ; 
                         processStep = 99; 
                     } else {
                         AIResponse = responseMessages[7]; // demande la ville
@@ -198,12 +206,12 @@ async function computeResponse(userRequest) {
                     frnsDataSubstep = 8;
                     break;
 
-                // numéro RCS / Siren
+                // numéro Siren
                 case 8:
                     if (!patternSiren.test(userRequest.replaceAll(" ", ""))) {
                         return responseMessages[12] + "\n" + promptFournisseurData[8]; // "num SIREN invalide"
                     }
-                    contratData.numRCS = 'RCS ' + contratData.villeImmat + ' B ' + userRequest;
+                    contratData.numSIREN = userRequest;
                     AIResponse = promptFournisseurData[9]; // demande le nom du représentant
                     frnsDataSubstep = 9;
                     break;
@@ -235,30 +243,39 @@ async function computeResponse(userRequest) {
         case 3:
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
                 contratData = structuredClone(dataAlliance);
-                AIResponse = promptFournisseurData[1];
-                processStep = 4;
+                // dans le cas d'un fournisseur existant, demander si on veut utiliser maxNumContrat +1 comme numéro de contrat
+                AIResponse = responseMessages[14]
+                    .replace("MAX_NUM_CONTRAT", contratData.maxNumContrat)
+                    .replace("NUM_CONTRAT_PLUS_UN", contratData.maxNumContrat + 1);
+                processStep = 31;
             } else {
                 AIResponse = promptFournisseurData[2];
                 processStep = 2;
             }
             break;
 
+        // confirmation : utiliser le num contrat +1
+        case 31:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                AIResponse = responseMessages[15].replace("NUM_CONTRAT_PLUS_UN", contratData.maxNumContrat + 1);
+                contratData.numContrat = contratData.maxNumContrat + 1;
+
+                // Confirmation des informations avant génération
+                AIResponse = AIResponse + "\n" + getConfirmationMsg();
+                processStep = 5;
+            } else {
+                AIResponse = promptFournisseurData[1]; // demande le num contrat
+                processStep = 4;
+            }
+            break;
+
         // demande du numéro de contrat
         case 4:
+            if (!isNaN(userRequest)) {
+                userRequest = parseInt(userRequest);
+            }
             contratData.numContrat = userRequest;
-            AIResponse = fillTemplate(responseMessages[2], {
-                NUM_CONTRAT: contratData.numContrat,
-                NOM_FOURNISSEUR: contratData.nomFrns,
-                ADR_FOURNISSEUR: contratData.adresseFrns,
-                CP_FOURNISSEUR: contratData.codePostalFrns,
-                VILLE_FOURNISSEUR: contratData.villeFrns,
-                RS_FOURNISSEUR: contratData.raisonSociale,
-                CAPITAL_FOURNISSEUR: contratData.capitalFrns,
-                IMMAT_FOURNISSEUR: contratData.villeImmat,
-                RCS_FOURNISSEUR: contratData.numRCS,
-                REPR_FOURNISSEUR: contratData.representantFrns,
-                FCT_REP_FOURNISSEUR: contratData.fonctionRepr
-            });
+            AIResponse = getConfirmationMsg();
             processStep = 5;
             break;
 
@@ -268,6 +285,8 @@ async function computeResponse(userRequest) {
                 contratData.validated = true;
                 AIResponse = responseMessages[4]
                 processStep = 6;
+                // Mettre à jour la valeur du dernier num contrat
+                dataAlliance.maxNumContrat = contratData.numContrat;
             } else {
                 initContratData();
                 AIResponse = responseMessages[8];
@@ -307,4 +326,20 @@ async function computeResponse(userRequest) {
             break;
     }
     return AIResponse;
+}
+
+function getConfirmationMsg() {
+    return fillTemplate(responseMessages[2], {  // message de confirmation
+        NUM_CONTRAT: contratData.numContrat,
+        NOM_FOURNISSEUR: contratData.nomFrns,
+        ADR_FOURNISSEUR: contratData.adresseFrns,
+        CP_FOURNISSEUR: contratData.codePostalFrns,
+        VILLE_FOURNISSEUR: contratData.villeFrns,
+        RS_FOURNISSEUR: contratData.raisonSociale,
+        CAPITAL_FOURNISSEUR: contratData.capitalFrns,
+        IMMAT_FOURNISSEUR: contratData.villeImmat,
+        SIREN_FOURNISSEUR: contratData.numSIREN,
+        REPR_FOURNISSEUR: contratData.representantFrns,
+        FCT_REP_FOURNISSEUR: contratData.fonctionRepr
+    })
 }
