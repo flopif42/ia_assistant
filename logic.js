@@ -6,7 +6,11 @@ const patternVille = /^[A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+$/;
 const patternCP = /^[0-9]{5}$/;
 const patternCapital = /^[0-9]+$/;
 const patternSiren = /^[0-9]{9}$/;
-const patternNomRepr = /^(m|mr|monsieur|mme|madame|mlle|mle|mademoiselle)\s([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)\s([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)$/;
+const patternNomRepr = /^(m|mr|monsieur|mme|madame|mlle|mle|mademoiselle)\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)$/;
+const patternAdresseComplete = /^(.*)([0-9]{5})\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+)$/;
+
+let adrCplCodePostal;
+let adrCplVille;
 
 async function computeResponse(userRequest) {
     let AIResponse;
@@ -42,7 +46,7 @@ async function computeResponse(userRequest) {
                     .replace('CP_ENTITY', entity.codePostal)
                     .replace('VILLE_ENTITY', entity.ville)
                     .replace('RS_ENTITY', entity.raisonSociale)
-                    .replace('CAPITAL_ENTITY', entity.capital)
+                    .replace('CAPITAL_ENTITY', formatCapital(entity.capital))
                     .replace('IMMAT_ENTITY', entity.villeImmat)
                     .replace('SIREN_ENTITY', entity.numSIREN)
                     .replace('REPR_ENTITY', entity.representant)
@@ -110,7 +114,7 @@ async function computeResponse(userRequest) {
                     .replace('CP_ENTITY', entity.codePostal)
                     .replace('VILLE_ENTITY', entity.ville)
                     .replace('RS_ENTITY', entity.raisonSociale)
-                    .replace('CAPITAL_ENTITY', entity.capital)
+                    .replace('CAPITAL_ENTITY', formatCapital(entity.capital))
                     .replace('IMMAT_ENTITY', entity.villeImmat)
                     .replace('SIREN_ENTITY', entity.numSIREN)
                     .replace('REPR_ENTITY', entity.representant)
@@ -179,11 +183,48 @@ async function computeResponse(userRequest) {
     
                 // rue
                 case SubStep.PROMPT_ADRESSE_ENTITY:
-                    entity.adresse = capitalize(userRequest);
-                    AIResponse = promptentityData[2]; // demande le code postal
-                    entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                    let isAdresseCompleteOK = false;
+                    adresseComplete = checkAdresseComplete(userRequest);
+                    if (adresseComplete) {
+                        entity.adresse = capitalize(adresseComplete[1].trim().replace(",", ""));
+                        adrCplCodePostal = adresseComplete[2];
+                        adrCplVille = adresseComplete[3];
+
+                        // vérifier la concordance du CP et de la ville
+                        const searchedCity = await getCityFromPostalCode(adrCplCodePostal);
+                        if (searchedCity && searchedCity.toLocaleLowerCase() == adrCplVille.toLocaleLowerCase()) {
+                            entity.codePostal = adrCplCodePostal;
+                            entity.ville = capitalize(adrCplVille);
+                            AIResponse = responseMessages[29] // validation cp + ville
+                                .replace("CODE_POSTAL", adrCplCodePostal)
+                                .replace("SEARCHED_CITY", searchedCity) + "\n" + promptentityData[5]; // demande la raison soc
+                            entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
+                        } else {
+                            AIResponse = responseMessages[30] // cp + ville non conforme
+                                .replace("CODE_POSTAL", adrCplCodePostal)
+                                .replace("SEARCHED_CITY", adrCplVille);
+                            entityCreationSubstep = SubStep.CONFIRM_USE_CP_VILLE;
+                        }
+                    } else { // not adresse complète (only rue)
+                        entity.adresse = capitalize(userRequest);
+                        AIResponse = promptentityData[2]; // demande le code postal
+                        entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                    }
                     break;
-    
+
+                // confirmer l'utilisation de CP et Ville qui ne correspondent pas
+                case SubStep.CONFIRM_USE_CP_VILLE:
+                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                        entity.codePostal = adrCplCodePostal;
+                        entity.ville = capitalize(adrCplVille);
+                        AIResponse = promptentityData[5]; // demande raison sociale
+                        entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
+                    } else {
+                        AIResponse = promptentityData[2]; // demande le code postal
+                        entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                    }
+                    break;
+
                 // code postal
                 case SubStep.PROMPT_CP_ENTITY:
                     if (!patternCP.test(userRequest)) {
@@ -239,8 +280,8 @@ async function computeResponse(userRequest) {
                 // capital
                 case SubStep.PROMPT_CAPITAL_ENTITY:
                     formattedCapital = userRequest.replaceAll(".", "").replaceAll(",", "");
-                    if (patternCapital.test(formattedCapital)) {
-                        entity.capital = formattedCapital;
+                    if (patternCapital.test(formattedCapital) && (parseInt(formattedCapital) != NaN)) {
+                        entity.capital = parseInt(formattedCapital);
                         AIResponse = promptentityData[7]; // demande la ville d'immat
                         entityCreationSubstep = SubStep.PROMPT_VILLE_IMMAT;
                     } else {
@@ -291,7 +332,7 @@ async function computeResponse(userRequest) {
                         .replace('CP_ENTITY', entity.codePostal)
                         .replace('VILLE_ENTITY', entity.ville)
                         .replace('RS_ENTITY', entity.raisonSociale)
-                        .replace('CAPITAL_ENTITY', entity.capital)
+                        .replace('CAPITAL_ENTITY', formatCapital(entity.capital))
                         .replace('IMMAT_ENTITY', entity.villeImmat)
                         .replace('SIREN_ENTITY', entity.numSIREN)
                         .replace('REPR_ENTITY', entity.representant)
@@ -364,7 +405,7 @@ function getConfirmationMsg() {
         CP_ENTITY: emetteur.codePostal,
         VILLE_ENTITY: emetteur.ville,
         RS_ENTITY: emetteur.raisonSociale,
-        CAPITAL_ENTITY: emetteur.capital,
+        CAPITAL_ENTITY: formatCapital(emetteur.capital),
         IMMAT_ENTITY: emetteur.villeImmat,
         SIREN_ENTITY: emetteur.numSIREN,
         REPR_ENTITY: emetteur.representant,
@@ -378,7 +419,7 @@ function getConfirmationMsg() {
         CP_ENTITY: fournisseur.codePostal,
         VILLE_ENTITY: fournisseur.ville,
         RS_ENTITY: fournisseur.raisonSociale,
-        CAPITAL_ENTITY: fournisseur.capital,
+        CAPITAL_ENTITY: formatCapital(fournisseur.capital),
         IMMAT_ENTITY: fournisseur.villeImmat,
         SIREN_ENTITY: fournisseur.numSIREN,
         REPR_ENTITY: fournisseur.representant,
@@ -464,4 +505,13 @@ async function isValidFrenchCity(cityName) {
     return data.some(commune =>
         commune.nom.toLowerCase() === cityName.trim().toLowerCase()
     );
+}
+
+function formatCapital(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function checkAdresseComplete(input) {
+    matches = patternAdresseComplete.exec(input);
+    return matches;
 }

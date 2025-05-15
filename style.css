@@ -25,7 +25,7 @@ html, body {
 }
 
 #companyLogo {
-    height: 40px;
+    height: 75px;
     max-width: 200px;
     object-fit: contain;
 }

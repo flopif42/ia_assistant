@@ -8,7 +8,7 @@ const promptentityData = [
     "Merci de saisir le <strong>capital</strong> 💶 de l'entité en euros :", // 6
     "Merci de saisir la <strong>ville d'immatriculation</strong> de l'entité :", // 7
     "Merci de saisir le <strong>numéro SIREN</strong> de l'entité :", // 8
-    "Merci de saisir les informations du <strong>représentant</strong> 👨‍💼 de l'entité NOM_ENTITY (civilité prénom NOM, par exemple : M. Jean MARTIN) :", // 9
+    "Merci de saisir les informations du <strong>représentant</strong> 👨‍💼 de l'entité NOM_ENTITY (M./Mme/Mlle prénom NOM, par exemple : M. Jean MARTIN) :", // 9
     "Merci de saisir la <strong>fonction</strong> du représentant de l'entité :" // 10
 ];
 
@@ -50,10 +50,10 @@ const responseMessages = [
 
     "Les différents types de contrat sont :\n\n" +  // 15
     "<strong>1.</strong> Prestation de services\n" +
-    "<strong>2.</strong> Contrat cadre\n" +
-    "<strong>3.</strong> Contrat d’abonnement\n" +
-    "<strong>4.</strong> Contrat de collaboration ou de partenariat\n\n" +
-    "Quel type souhaites-tu utiliser ?",
+    "<strong>2.</strong> Contrat cadre <i>(non disponible)</i>\n" +
+    "<strong>3.</strong> Contrat d’abonnement <i>(non disponible)</i>\n" +
+    "<strong>4.</strong> Contrat de collaboration ou de partenariat <i>(non disponible)</i>\n\n" +
+    "Merci de saisir <strong>le numéro</strong> correspondant au type de contrat que tu souhaites générer :",
 
     "🤷 Je n'ai pas trouvé l'entité <strong>NOM_ENTITY</strong> dans la base. Veux-tu créer une nouvelle entité ?", // 16
     "🎯 Le code postal CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
@@ -73,5 +73,8 @@ const responseMessages = [
     "<strong><strong>1. </strong></strong> Quelle est l’entité émettrice du contrat ?", // 25
     "❌ Ce numéro de contrat ne semble pas correct.", // 26
     "<strong><strong>3. </strong></strong> Quelle est l’entité fournisseur du contrat ?", // 27
-    "❌ Le nom du représentant ne correspond pas au format attendu." // 28
+    "❌ Le nom du représentant ne correspond pas au format attendu.", // 28
+    "✅ Le code postal <strong>CODE_POSTAL</strong> correspond bien à la ville de <strong>SEARCHED_CITY</strong>.", // 29
+    "❌ Je n'ai pas pu valider la correspondance entre le code postal <strong>CODE_POSTAL</strong> " + //30
+    "et la ville de <strong>SEARCHED_CITY</strong>. Veux-tu tout de même utiliser ces informations ?"
 ];
