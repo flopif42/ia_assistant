@@ -9,7 +9,7 @@ const promptentityData = [
     "Merci de saisir la <strong>ville d'immatriculation</strong> de l'entité :", // 7
     "Merci de saisir le <strong>numéro SIREN</strong> de l'entité :", // 8
     "Merci de saisir les informations du <strong>représentant</strong> 👨‍💼 de l'entité NOM_ENTITY (M./Mme/Mlle prénom NOM, par exemple : M. Jean MARTIN) :", // 9
-    "Merci de saisir la <strong>fonction</strong> du représentant de l'entité :" // 10
+    "Quelle est la <strong>fonction</strong> de NOM_REPR ?" // 10
 ];
 
 const infosRecap = "<strong>NOM_ENTITY</strong>\n" +
@@ -76,8 +76,10 @@ const responseMessages = [
     "<strong><strong>3. </strong></strong> Quelle est l’entité fournisseur du contrat ?", // 27
     "❌ Le nom du représentant ne correspond pas au format attendu.", // 28
     "✅ Le code postal <strong>CODE_POSTAL</strong> correspond bien à la ville de <strong>SEARCHED_CITY</strong>.", // 29
+
     "❌ Je n'ai pas pu valider la correspondance entre le code postal <strong>CODE_POSTAL</strong> " + // 30
     "et la ville de <strong>SEARCHED_CITY</strong>. Veux-tu tout de même utiliser ces informations ?",
 
-    "Souhaites-tu utiliser ce numéro pour le contrat : <strong>REF_CONTRAT</strong> ?" // 31
+    "Souhaites-tu utiliser ce numéro pour le contrat : <strong>REF_CONTRAT</strong> ?", // 31
+    "Est-ce que REPR_ENTITY agit en qualité de <strong>PROPOSED_FCT</strong> ?" // 32
 ];

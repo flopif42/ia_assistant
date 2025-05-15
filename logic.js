@@ -313,13 +313,41 @@ async function computeResponse(userRequest) {
                     nomRepr = checkNomRepresentant(userRequest);
                     if (nomRepr) {
                         entity.representant = nomRepr;
-                        AIResponse = promptentityData[10]; // demande fonction représentant
-                        entityCreationSubstep = SubStep.PROMPT_FCT_REPR_ENTITY;
+
+                        // proposer la qualité du représentant en fonction du type de société
+                        entity.fonctionRepr = getFctRepProposition(entity.raisonSociale);
+                        AIResponse = responseMessages[32]
+                            .replace("REPR_ENTITY", entity.representant)
+                            .replace("PROPOSED_FCT", entity.fonctionRepr); // utiliser la qualité proposée ?
+                        entityCreationSubstep = SubStep.CONFIRM_USE_PROPOSED_FCT_REP;
                     } else {
                         AIResponse = responseMessages[28] + "\n" + promptentityData[9]; // format nom représentant invalide
                     }
                     break;
-    
+
+                // confirmer le choix de la fonction/qualité du représentant
+                case SubStep.CONFIRM_USE_PROPOSED_FCT_REP:
+                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                        AIResponse = responseMessages[22]
+                            .replaceAll('NOM_ENTITY', entity.nom)
+                            .replace('ADR_ENTITY', entity.adresse)
+                            .replace('CP_ENTITY', entity.codePostal)
+                            .replace('VILLE_ENTITY', entity.ville)
+                            .replace('RS_ENTITY', entity.raisonSociale)
+                            .replace('CAPITAL_ENTITY', formatCapital(entity.capital))
+                            .replace('IMMAT_ENTITY', entity.villeImmat)
+                            .replace('SIREN_ENTITY', entity.numSIREN)
+                            .replace('REPR_ENTITY', entity.representant)
+                            .replace('FCT_REP_ENTITY', entity.fonctionRepr); // confirmer les infos pour la création de l'entité ?
+                        entityCreationSubstep = SubStep.CONFIRM_ENTITY_DATA;
+                    } else {
+                        words = entity.representant.split(" ");
+                        reprName = words[0] + " " + words[2];
+                        AIResponse = promptentityData[10].replace("NOM_REPR", reprName); // demande fonction représentant
+                        entityCreationSubstep = SubStep.PROMPT_FCT_REPR_ENTITY;
+                    }
+                    break;
+
                 // fonction représentant
                 case SubStep.PROMPT_FCT_REPR_ENTITY:
                     entity.fonctionRepr = capitalize(userRequest);
@@ -519,4 +547,24 @@ function formatCapital(num) {
 function checkAdresseComplete(input) {
     matches = patternAdresseComplete.exec(input);
     return matches;
+}
+
+function getFctRepProposition(raisonSociale) {
+    rsClean = raisonSociale.toLocaleLowerCase().replaceAll(".", "");
+    switch (rsClean) {
+        case 'sa':
+            return "Président-Directeur Général";
+
+        case 'sarl':
+        case 'sas':
+        case 'sasu':
+            return "Président";
+
+        case 'snc':
+        case 'eurl':
+            return "Gérant";
+
+        default:
+            return null;
+    }
 }
