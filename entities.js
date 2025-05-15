@@ -5,12 +5,12 @@ const entities = [
         codePostal: '75009',
         ville: 'Paris',
         raisonSociale: 'SAS',
-        capital: '500.000',
+        capital: 500000,
         villeImmat: 'Nanterre',
         numSIREN: '504 729 286',
         representant: 'M. Michael MALKA',
         fonctionRepr: 'Président',
-        maxNumContrat: 41
+        maxNumContrat: 418567
     },
     {
         nom: 'Capgemini',
@@ -18,11 +18,11 @@ const entities = [
         codePostal: '92130',
         ville: 'Issy-les-Moulineaux',
         raisonSociale: 'SARL',
-        capital: '30.000.000.000',
+        capital: 30000000000,
         villeImmat: 'Nanterre',
         numSIREN: '328 781 786',
-        representant: 'M. Aiman EZZATO',
-        fonctionRepr: 'Directeur général',
+        representant: 'M. Aiman EZZAT',
+        fonctionRepr: 'Directeur Général',
         maxNumContrat: 85419
     },
     {
@@ -31,11 +31,11 @@ const entities = [
         codePostal: '75015',
         ville: 'Paris',
         raisonSociale: 'SA',
-        capital: '56.000.000',
+        capital: 56000000,
         villeImmat: 'Paris',
         numSIREN: '487 739 963',
         representant: 'M. Daniel COLLIGNON',
-        fonctionRepr: 'Directeur général',
+        fonctionRepr: 'Directeur Général',
         maxNumContrat: 1390
     }
 ];

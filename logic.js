@@ -238,8 +238,9 @@ async function computeResponse(userRequest) {
     
                 // capital
                 case SubStep.PROMPT_CAPITAL_ENTITY:
-                    if (patternCapital.test(userRequest.replaceAll(".", "").replaceAll(",", ""))) {
-                        entity.capital = userRequest;
+                    formattedCapital = userRequest.replaceAll(".", "").replaceAll(",", "");
+                    if (patternCapital.test(formattedCapital)) {
+                        entity.capital = formattedCapital;
                         AIResponse = promptentityData[7]; // demande la ville d'immat
                         entityCreationSubstep = SubStep.PROMPT_VILLE_IMMAT;
                     } else {
