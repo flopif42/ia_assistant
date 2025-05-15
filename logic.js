@@ -1,80 +1,3 @@
-const promptentityData = [
-    "Merci de saisir le <strong>nom</strong> 🏦 de l'entité :", // 0
-    "Merci de saisir le <strong>numéro de référence</strong> pour le premier contrat avec ce fournisseur 📝 :", // 1
-    "Merci de saisir le <strong>code postal</strong> de l'entité :", // 2
-    "Merci de saisir la <strong>ville</strong> de l'entité :", // 3
-    "Merci de saisir l'<strong>adresse</strong> 📍 de l'entité :", // 4
-    "Merci de saisir la <strong>raison sociale</strong> 🏢 de l'entité :", // 5
-    "Merci de saisir le <strong>capital</strong> 💶 de l'entité en euros :", // 6
-    "Merci de saisir la <strong>ville d'immatriculation</strong> de l'entité :", // 7
-    "Merci de saisir le <strong>numéro SIREN</strong> de l'entité :", // 8
-    "Merci de saisir le <strong>représentant</strong> 👨‍💼 de l'entité (civilité prénom NOM, par exemple : M. Jean MARTIN) :", // 9
-    "Merci de saisir la <strong>fonction</strong> du représentant de l'entité :" // 10
-];
-
-const infosRecap = "<strong>NOM_ENTITY</strong>\n" +
-    "📍 ADR_ENTITY\n" +
-    "CP_ENTITY VILLE_ENTITY\n\n" +
-    "🏢 RS_ENTITY au capital de CAPITAL_ENTITY euros\n" +
-    "n° RCS : RCS IMMAT_ENTITY SIREN_ENTITY\n" +
-    "Représentée par REPR_ENTITY, FCT_REP_ENTITY\n";
-
-const responseMessages = [
-    "Je n'ai pas compris ta demande.", // 0
-
-    "J'ai compris que tu souhaites créer un <strong>contrat</strong>. Afin de pouvoir t'assister, j'aurais besoin des informations suivantes :\n", // 1
-    
-    "📝 <strong>N° du contrat</strong> : NUM_CONTRAT de type Prestation de services entre d'une part :\n\n" + // 2
-    "INFOS_FOURNISSEUR\n" +
-    "Et d'autre part :\n\n" +
-    "INFOS_EMETTEUR\n" +
-    "Confirmes-tu l'exactitude de ces informations ?",
-
-    "Comment puis-je t'aider ?", // 3
-    "Très bien, je vais générer ton contrat.", // 4
-    "Désires-tu générer un autre contrat ?", // 5
-
-    "L'entité NOM_ENTITY a été trouvée dans la base avec les informations suivantes :\n\n" + // 6
-    infosRecap + "\n" +
-    "Souhaites-tu l'utiliser en tant que ROLE_ENTITY ?",
-
-    "Je n’ai pas pu trouver de ville pour ce code postal. Merci de saisir le nom de la ville manuellement :", // 7
-    "La création du contrat a été annulée.\nComment puis-je t'aider ?", //8
-    "❌ Cela ne semble pas être un code postal valide.", //9
-    "❌ Cela ne semble pas être une raison sociale valide. Les différents types sont SA, SNC, SARL, EURL, SAS et SASU.", // 10
-    "❌ Le montant saisi ne semble pas correct.", // 11
-    "❌ Le numéro SIREN doit être composé de 9 chiffres.", // 12
-    "❌ Cela ne semble pas être un nom de ville valide.", //13
-    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>." +// 14
-    "Je vais créer le nouveau contrat avec le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> et les données suivantes :\n", 
-
-    "Les différents types de contrat sont :\n\n" +  // 15
-    "<strong>1.</strong> Prestation de services\n" +
-    "<strong>2.</strong> Contrat cadre\n" +
-    "<strong>3.</strong> Contrat d’abonnement\n" +
-    "<strong>4.</strong> Contrat de collaboration ou de partenariat\n\n" +
-    "Quel type souhaites-tu utiliser ?",
-
-    "🤷 Je n'ai pas trouvé l'entité <strong>NOM_ENTITY</strong> dans la base. Veux-tu créer une nouvelle entité ?", // 16
-    "🎯 Le code postal CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
-    "Je suis ton agent IA qui te permet de rédiger tes contrats, en quoi puis-je t'aider ?", // 18
-
-    "✅ Nous allons utiliser l'entité <strong>NOM_ENTITY</strong> comme ROLE_ENTITY du contrat.", // 19
-
-    "❌ Je suis navré mais ce type de contrat n'est pas encore pris en charge.", // 20
-    "<strong><strong>3.</strong></strong> Quelle est l’entité fournisseur du contrat ?", // 21
-
-    "Je m'apprête à créer une nouvelle entité avec les données suivantes :\n" + // 22
-    infosRecap + "\n" +
-    "Confirmes-tu l'exactitude de ces informations ?",
-
-    "<strong><strong>2. </strong></strong>Maintenant nous allons passer au <strong>type de contrat</strong> 📝.", // 23
-    "Tu dois dois utiliser une entité existante pour pouvoir créer un contrat.", // 24
-    "<strong><strong>1. </strong></strong> Quelle est l’entité émettrice du contrat ?", // 25
-    "❌ Ce numéro de contrat ne semble pas correct.", // 26
-    "<strong><strong>3. </strong></strong> Quelle est l’entité fournisseur du contrat ?", // 27
-];
-
 const raisonsSociales = [
     'sa', 'snc', 'sarl', 'eurl', 'sas', 'sasu'
 ];
@@ -83,6 +6,7 @@ const patternVille = /^[A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+$/;
 const patternCP = /^[0-9]{5}$/;
 const patternCapital = /^[0-9]+$/;
 const patternSiren = /^[0-9]{9}$/;
+const patternNomRepr = /^(m|mr|monsieur|mme|madame|mlle|mle|mademoiselle)\s([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)\s([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)$/;
 
 async function computeResponse(userRequest) {
     let AIResponse;
@@ -138,7 +62,7 @@ async function computeResponse(userRequest) {
             AIResponse = responseMessages[19]
                 .replace("NOM_ENTITY", entity.nom)
                 .replace("ROLE_ENTITY", "émetteur") + "\n" + // confirme l'entity pour le role
-                responseMessages[23] + 
+                responseMessages[23] + " " +
                 responseMessages[15] // demande le type de contrat
             processStep = Step.PROMPT_CONTRAT_TYPE;
         } else {
@@ -255,7 +179,7 @@ async function computeResponse(userRequest) {
     
                 // rue
                 case SubStep.PROMPT_ADRESSE_ENTITY:
-                    entity.adresse = userRequest;
+                    entity.adresse = capitalize(userRequest);
                     AIResponse = promptentityData[2]; // demande le code postal
                     entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
                     break;
@@ -292,8 +216,8 @@ async function computeResponse(userRequest) {
 
                 // ville
                 case SubStep.PROMPT_VILLE_ENTITY:
-                    if (patternVille.test(userRequest)) {
-                        entity.ville = userRequest;
+                    if (patternVille.test(userRequest) && await isValidFrenchCity(userRequest)) {
+                        entity.ville = capitalize(userRequest);
                         AIResponse = promptentityData[5]; // demande la raison soc
                         entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
                     } else {
@@ -306,7 +230,7 @@ async function computeResponse(userRequest) {
                     if (raisonsSociales.indexOf(lowercaseUserRequest.replaceAll(".", "")) == -1) {
                         AIResponse = responseMessages[10] + "\n" + promptentityData[5]; // "raison sociale invalide"
                     } else {
-                        entity.raisonSociale = userRequest;
+                        entity.raisonSociale = userRequest.toLocaleUpperCase();
                         AIResponse = promptentityData[6]; // demande le capital
                         entityCreationSubstep = SubStep.PROMPT_CAPITAL_ENTITY;
                     }
@@ -325,8 +249,8 @@ async function computeResponse(userRequest) {
     
                 // ville d'immatriculation
                 case SubStep.PROMPT_VILLE_IMMAT:
-                    if (patternVille.test(userRequest)) {
-                        entity.villeImmat = userRequest;
+                    if (patternVille.test(userRequest) && await isValidFrenchCity(userRequest)) {
+                        entity.villeImmat = capitalize(userRequest);
                         AIResponse = promptentityData[8]; // demande le num SIREN
                         entityCreationSubstep = SubStep.PROMPT_SIREN_ENTITY;
                     } else {
@@ -338,7 +262,7 @@ async function computeResponse(userRequest) {
                 case SubStep.PROMPT_SIREN_ENTITY:
                     if (patternSiren.test(userRequest.replaceAll(" ", ""))) {
                         entity.numSIREN = userRequest.substring(0, 3) + " " + userRequest.substring(3, 6) + " " + userRequest.substring(6);
-                        AIResponse = promptentityData[9]; // demande le nom du représentant
+                        AIResponse = promptentityData[9].replace("NOM_ENTITY", entity.nom); // demande le nom du représentant
                         entityCreationSubstep = SubStep.PROMPT_REPR_ENTITY;
                     } else {
                         AIResponse = responseMessages[12] + "\n" + promptentityData[8]; // "num SIREN invalide"
@@ -347,14 +271,19 @@ async function computeResponse(userRequest) {
     
                 // nom représentant
                 case SubStep.PROMPT_REPR_ENTITY:
-                    entity.representant = userRequest;
-                    AIResponse = promptentityData[10]; // demande fonction représentant
-                    entityCreationSubstep = SubStep.PROMPT_FCT_REPR_ENTITY;
+                    nomRepr = checkNomRepresentant(userRequest);
+                    if (nomRepr) {
+                        entity.representant = nomRepr;
+                        AIResponse = promptentityData[10]; // demande fonction représentant
+                        entityCreationSubstep = SubStep.PROMPT_FCT_REPR_ENTITY;
+                    } else {
+                        AIResponse = responseMessages[28] + "\n" + promptentityData[9]; // format nom représentant invalide
+                    }
                     break;
     
                 // fonction représentant
                 case SubStep.PROMPT_FCT_REPR_ENTITY:
-                    entity.fonctionRepr = userRequest;
+                    entity.fonctionRepr = capitalize(userRequest);
                     AIResponse = responseMessages[22]
                         .replaceAll('NOM_ENTITY', entity.nom)
                         .replace('ADR_ENTITY', entity.adresse)
@@ -423,7 +352,6 @@ async function computeResponse(userRequest) {
             processStep = Step.BEGIN;
             break;
     }
-    // console.log("current step : " + processStep + ", previous step : " + previousStep);
     return AIResponse;
 }
 
@@ -480,4 +408,59 @@ async function getCityFromPostalCode(cp) {
         console.error("Erreur lors de la récupération de la ville :", err);
     }
     return null;
+}
+
+function formatCivilite(input) {
+    switch (input) {
+        case 'm':
+        case 'mr':
+        case 'monsieur':
+            return "M.";
+
+        case 'mme':
+        case 'madame':
+            return "Mme.";
+
+        case 'mlle':
+        case 'mle':
+        case 'mademoiselle':
+            return "Mlle.";
+
+        default:
+            return null;
+    }
+}
+
+function capitalize(input) {
+    let output = "";
+    for (let i = 0; i < input.length; i++) {
+        if (i == 0 || (i > 0 && (input[i - 1] == '-' || input[i - 1] == ' '))) {
+            output += input[i].toLocaleUpperCase();
+        } else {
+            output += input[i].toLocaleLowerCase();;
+        }
+    }
+    return output;
+}
+
+function checkNomRepresentant(userText) {
+    matches = patternNomRepr.exec(userText.toLocaleLowerCase().replace(".", ""));
+    if (!matches) {
+        return null;
+    }
+    civ = formatCivilite(matches[1]);
+    prenom = capitalize(matches[2]);
+    nom = matches[3].toLocaleUpperCase();
+    return civ + " " + prenom + " " + nom;
+}
+
+async function isValidFrenchCity(cityName) {
+    const normalized = cityName;
+    const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(normalized)}&fields=nom&limit=5`);
+    const data = await response.json();
+
+    // check if ANY returned city's name matches exactly
+    return data.some(commune =>
+        commune.nom.toLowerCase() === cityName.trim().toLowerCase()
+    );
 }

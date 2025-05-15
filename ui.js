@@ -1,3 +1,7 @@
+const minBotDelayMs = 200;
+const maxBotDelayMs = 1000;
+const typingDelayMs = 5;
+
 function typeMessage(html, className = 'ai', delay = typingDelayMs) {
     return new Promise(resolve => {
         const messageEl = document.createElement('div');
@@ -82,11 +86,18 @@ async function handleUserInput() {
     userMsg.textContent = userInputText;
     chat.appendChild(userMsg);
     chat.scrollTop = chat.scrollHeight;
-
+    /*
     // AI message
     await wait(delayBeforeBotRespondsMs); // short delay before bot responds
     const AIMsg = await computeResponse(userInputText);
     await typeMessage(AIMsg);
+    */
+
+    const stopThinking = showThinkingDots(); // show animation
+    const AIMsg = await computeResponse(userInputText); // now it's async!
+    await wait(getRandomBotDelay() + getSmartBotDelay(AIMsg));     // simulate thinking delay
+    stopThinking();                           // remove animation
+    await typeMessage(AIMsg);                 // display actual message
 
     // if all info has been filled, generate contrat
     if (contrat.validated) {
@@ -171,4 +182,37 @@ async function handleUserInput() {
         initAll();
         await typeMessage(responseMessages[5]);  // "générer un autre contrat ?"
     }
+}
+
+function getRandomBotDelay(min = minBotDelayMs, max = maxBotDelayMs) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getSmartBotDelay(message) {
+    const base = message.length * 5; // ~5ms per char
+    return Math.min(Math.max(base, 300), 1500); // clamp between 300–1500ms
+}
+
+function showThinkingDots() {
+    const dotsMessage = document.createElement('div');
+    dotsMessage.className = 'dots';
+    dotsMessage.id = 'thinkingDots';
+
+    const dotSpan = document.createElement('span');
+    dotSpan.className = 'typing-dots';
+    dotsMessage.appendChild(dotSpan);
+
+    chat.appendChild(dotsMessage);
+    chat.scrollTop = chat.scrollHeight;
+
+    let dotCount = 0;
+    const interval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // 0–3 dots
+        dotSpan.textContent = '●'.repeat(dotCount);
+    }, 400);
+
+    return () => {
+        clearInterval(interval);
+        dotsMessage.remove();
+    };
 }
