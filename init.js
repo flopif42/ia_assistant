@@ -55,18 +55,6 @@ function initContrat() {
 
 function initEntity() {
     entity = null;
-    /*
-    entity.nom = null;
-    entity.adresse = null;
-    entity.codePostal = null;
-    entity.ville = null;
-    entity.raisonSociale = null;
-    entity.capital = null;
-    entity.villeImmat = null;
-    entity.numSIREN = null;
-    entity.representant = null;
-    entity.fonctionRepr = null;
-    */
 }
 
 function fillTemplate(template, data) {
