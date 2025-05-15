@@ -24,14 +24,15 @@ const responseMessages = [
 
     "J'ai compris que tu souhaites créer un <strong>contrat</strong>. Afin de pouvoir t'assister, j'aurais besoin des informations suivantes :\n", // 1
 
-    "📝 N° du contrat : <strong>REF_CONTRAT</strong> de type Prestation de services entre d'une part:\n\n" + // 2
+    "🏃 On y est presque ! Il ne reste plus qu'une dernière vérification avant la génération de ton document.\n" + // 2
+    "📝 N° du contrat : <strong>REF_CONTRAT</strong> de type Prestation de services entre d'une part :\n\n" + 
     "INFOS_FOURNISSEUR\n" +
     "Et d'autre part :\n\n" +
     "INFOS_EMETTEUR\n" +
     "Confirmes-tu l'exactitude de ces informations ?",
 
     "Comment puis-je t'aider ?", // 3
-    "Très bien, je vais générer ton contrat.", // 4
+    "✅ Parfait, je vais maintenant générer ton contrat.", // 4
     "Désires-tu générer un autre contrat ?", // 5
 
     "L'entité NOM_ENTITY a été trouvée dans la base avec les informations suivantes :\n\n" + // 6
@@ -59,7 +60,7 @@ const responseMessages = [
     "🎯 Le code postal CODE_POSTAL correspond à la commune de <strong>GUESSED_CITY</strong>. Souhaites-tu utiliser cette donnée ?", // 17
     "Je suis ton agent IA qui te permet de rédiger tes contrats, en quoi puis-je t'aider ?", // 18
 
-    "✅ Nous allons utiliser l'entité <strong>NOM_ENTITY</strong> comme ROLE_ENTITY du contrat.", // 19
+    "✅ OK, nous allons utiliser l'entité <strong>NOM_ENTITY</strong> comme ROLE_ENTITY du contrat.", // 19
 
     "❌ Je suis navré mais ce type de contrat n'est pas encore pris en charge.", // 20
     "<strong><strong>3.</strong></strong> Quelle est l’entité fournisseur du contrat ?", // 21
@@ -68,7 +69,7 @@ const responseMessages = [
     infosRecap + "\n" +
     "Confirmes-tu l'exactitude de ces informations ?",
 
-    "<strong><strong>2. </strong></strong>Maintenant nous allons passer au <strong>type de contrat</strong> 📝.", // 23
+    "<strong><strong>2. </strong></strong>Passons maintenant au <strong>type de contrat</strong> 📝.", // 23
     "Tu dois utiliser une entité existante pour pouvoir créer un contrat.", // 24
     "<strong><strong>1. </strong></strong> Quelle est l’entité émettrice du contrat ?", // 25
     "❌ Ce numéro de contrat ne semble pas correct.", // 26

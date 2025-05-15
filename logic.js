@@ -132,14 +132,8 @@ async function computeResponse(userRequest) {
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
                 contrat.fournisseur = entity;
                 contrat.numContrat = entity.maxNumContrat + 1;
-
                 contrat.refContrat = "CP-" + MMYY_Date + "-" + contrat.fournisseur.nom + "-" + contrat.numContrat;
-
-                // Confirmation des informations avant génération du contrat
-                AIResponse = responseMessages[14]        // dans le cas d'un entity existant, utiliser maxNumContrat +1 comme numéro de contrat
-                    .replace("NUM_CONTRAT_PLUS_UN", entity.maxNumContrat + 1)
-                    .replace("MAX_NUM_CONTRAT", entity.maxNumContrat) + "\n" +
-                    getConfirmationMsg();
+                AIResponse = responseMessages[31].replace("REF_CONTRAT", contrat.refContrat); // utilise la ref contrat générée ?
                 processStep = Step.CONFIRM_USE_GENERATED_REF_CONTRAT;
             } else {
                 AIResponse = responseMessages[24] + "\n" + responseMessages[27]; 
@@ -205,7 +199,7 @@ async function computeResponse(userRequest) {
                         } else {
                             AIResponse = responseMessages[30] // cp + ville non conforme
                                 .replace("CODE_POSTAL", adrCplCodePostal)
-                                .replace("SEARCHED_CITY", adrCplVille);
+                                .replace("SEARCHED_CITY", capitalize(adrCplVille));
                             entityCreationSubstep = SubStep.CONFIRM_USE_CP_VILLE;
                         }
                     } else { // not adresse complète (only rue)
@@ -362,7 +356,7 @@ async function computeResponse(userRequest) {
 
                             // generated REF contrat
                             contrat.refContrat = "CP-" + MMYY_Date + "-" + contrat.fournisseur.nom + "-" + "1";
-                            additionalMsg = responseMessages[31].replace("REF_CONTRAT", contrat.refContrat);
+                            additionalMsg = responseMessages[31].replace("REF_CONTRAT", contrat.refContrat); // utilise la ref contrat générée ?
                             processStep = Step.CONFIRM_USE_GENERATED_REF_CONTRAT;
                         }
                         AIResponse = responseMessages[19]

@@ -161,7 +161,7 @@ async function handleUserInput() {
         spinnerMessage.remove();
 
         // display result
-        msg = "✅ Ton document est prêt à être téléchargé.";
+        msg = "🎉 Et voilà ! Ton document est prêt à être téléchargé.";
         await typeMessage(msg);
 
         const downloadLink = document.createElement('a');
