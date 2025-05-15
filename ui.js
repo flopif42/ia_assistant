@@ -127,6 +127,7 @@ async function handleUserInput() {
         doc.setData({
             DDYY: DDYY_Date,
             NUM_CONTRAT: contrat.numContrat,
+            DATE_SIGNATURE: dateSignature,
 
             // infos fournisseur
             NOM_FOURNISSEUR: fournisseur.nom,

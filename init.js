@@ -45,6 +45,7 @@ let entity;
 
 const d = new Date();
 const DDYY_Date = d.getDate() + "" + (d.getFullYear() - 2000);
+const dateSignature = new Date().toLocaleDateString('fr-FR');
 
 function initContrat() {
     contrat.numContrat = null;
