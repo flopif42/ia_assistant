@@ -18,7 +18,8 @@ const Step = {
     CONFIRM_CONTRAT_DATA: 7,
     CONFIRM_GENERATE_ANOTHER_CONTRAT: 8,
     CREATE_ENTITY: 9,
-    PROMPT_NUM_CONTRAT: 10
+    PROMPT_REF_CONTRAT: 10,
+    CONFIRM_USE_GENERATED_REF_CONTRAT: 11
 };
 
 const SubStep = {
@@ -45,11 +46,16 @@ let contrat = {}
 let entity;
 
 const d = new Date();
-const DDYY_Date = d.getDate() + "" + (d.getFullYear() - 2000);
+const month = d.getMonth() + 1;
+if (month < 10) {
+    strMonth = "0" + month;
+}
+const MMYY_Date = strMonth + "" + (d.getFullYear() - 2000);
 const dateSignature = new Date().toLocaleDateString('fr-FR');
 
 function initContrat() {
     contrat.numContrat = null;
+    contrat.refContrat = null;
     contrat.fournisseur = null;
     contrat.emetteur = null;
     contrat.validated = false;

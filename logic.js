@@ -132,12 +132,15 @@ async function computeResponse(userRequest) {
             if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
                 contrat.fournisseur = entity;
                 contrat.numContrat = entity.maxNumContrat + 1;
-                // Confirmation des informations avant génération
+
+                contrat.refContrat = "CP-" + MMYY_Date + "-" + contrat.fournisseur.nom + "-" + contrat.numContrat;
+
+                // Confirmation des informations avant génération du contrat
                 AIResponse = responseMessages[14]        // dans le cas d'un entity existant, utiliser maxNumContrat +1 comme numéro de contrat
                     .replace("NUM_CONTRAT_PLUS_UN", entity.maxNumContrat + 1)
                     .replace("MAX_NUM_CONTRAT", entity.maxNumContrat) + "\n" +
                     getConfirmationMsg();
-                processStep = Step.CONFIRM_CONTRAT_DATA;
+                processStep = Step.CONFIRM_USE_GENERATED_REF_CONTRAT;
             } else {
                 AIResponse = responseMessages[24] + "\n" + responseMessages[27]; 
                 processStep = Step.PROMPT_FOURNISSEUR_ENTITY;
@@ -355,8 +358,12 @@ async function computeResponse(userRequest) {
                         } else {
                             roleEntity = "fournisseur";
                             contrat.fournisseur = persistedEntity;
-                            additionalMsg = promptentityData[1];
-                            processStep = Step.PROMPT_NUM_CONTRAT;
+                            contrat.fournisseur.maxNumContrat = 1;
+
+                            // generated REF contrat
+                            contrat.refContrat = "CP-" + MMYY_Date + "-" + contrat.fournisseur.nom + "-" + "1";
+                            additionalMsg = responseMessages[31].replace("REF_CONTRAT", contrat.refContrat);
+                            processStep = Step.CONFIRM_USE_GENERATED_REF_CONTRAT;
                         }
                         AIResponse = responseMessages[19]
                             .replace("NOM_ENTITY", entity.nom)
@@ -375,18 +382,23 @@ async function computeResponse(userRequest) {
                     break;
             }
             break;
-  
-        // demande du numéro de contrat
-        case Step.PROMPT_NUM_CONTRAT:
-            if (isNaN(userRequest)) {
-                AIResponse = responseMessages[26]; // "num contrat invalide"
-            } else {
-                userRequest = parseInt(userRequest);
-                contrat.numContrat = userRequest;
-                contrat.fournisseur.maxNumContrat = contrat.numContrat;
+
+        // confirme si utiliser la ref contrat générée ou saisie manuelle
+        case Step.CONFIRM_USE_GENERATED_REF_CONTRAT:
+            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
                 AIResponse = getConfirmationMsg();
                 processStep = Step.CONFIRM_CONTRAT_DATA;
+            } else {
+                AIResponse = promptentityData[1];
+                processStep = Step.PROMPT_REF_CONTRAT;
             }
+            break;
+  
+        // demande de la référence du contrat
+        case Step.PROMPT_REF_CONTRAT:
+            contrat.refContrat = userRequest;
+            AIResponse = getConfirmationMsg();
+            processStep = Step.CONFIRM_CONTRAT_DATA;
             break;
 
         default:
@@ -427,12 +439,11 @@ function getConfirmationMsg() {
     });
 
     return fillTemplate(responseMessages[2], {  // message de confirmation
-        NUM_CONTRAT: contrat.numContrat,
+        REF_CONTRAT: contrat.refContrat,
         INFOS_EMETTEUR: infosEmetteur,
         INFOS_FOURNISSEUR: infosFournisseur
     })
 }
-
 
 function getEntity(keyword) {
     keyword = keyword.toLowerCase();

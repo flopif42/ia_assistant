@@ -1,6 +1,6 @@
 const promptentityData = [
     "Merci de saisir le <strong>nom</strong> 🏦 de l'entité :", // 0
-    "Merci de saisir le <strong>numéro de référence</strong> pour le premier contrat avec ce fournisseur 📝 :", // 1
+    "Merci de saisir la <strong>référence</strong> du contrat 📝 :", // 1
     "Merci de saisir le <strong>code postal</strong> de l'entité :", // 2
     "Merci de saisir la <strong>ville</strong> de l'entité :", // 3
     "Merci de saisir l'<strong>adresse</strong> 📍 de l'entité :", // 4
@@ -23,8 +23,8 @@ const responseMessages = [
     "Je n'ai pas compris ta demande.", // 0
 
     "J'ai compris que tu souhaites créer un <strong>contrat</strong>. Afin de pouvoir t'assister, j'aurais besoin des informations suivantes :\n", // 1
-    
-    "📝 <strong>N° du contrat</strong> : NUM_CONTRAT de type Prestation de services entre d'une part :\n\n" + // 2
+
+    "📝 N° du contrat : <strong>REF_CONTRAT</strong> de type Prestation de services entre d'une part:\n\n" + // 2
     "INFOS_FOURNISSEUR\n" +
     "Et d'autre part :\n\n" +
     "INFOS_EMETTEUR\n" +
@@ -46,7 +46,7 @@ const responseMessages = [
     "❌ Le numéro SIREN doit être composé de 9 chiffres.", // 12
     "❌ Cela ne semble pas être un nom de ville valide.", //13
     "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. " +// 14
-    "Je vais créer le nouveau contrat avec le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> et les données suivantes :\n", 
+    "Je vais créer le nouveau contrat avec le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> et les données suivantes :\n",
 
     "Les différents types de contrat sont :\n\n" +  // 15
     "<strong>1.</strong> Prestation de services\n" +
@@ -75,6 +75,8 @@ const responseMessages = [
     "<strong><strong>3. </strong></strong> Quelle est l’entité fournisseur du contrat ?", // 27
     "❌ Le nom du représentant ne correspond pas au format attendu.", // 28
     "✅ Le code postal <strong>CODE_POSTAL</strong> correspond bien à la ville de <strong>SEARCHED_CITY</strong>.", // 29
-    "❌ Je n'ai pas pu valider la correspondance entre le code postal <strong>CODE_POSTAL</strong> " + //30
-    "et la ville de <strong>SEARCHED_CITY</strong>. Veux-tu tout de même utiliser ces informations ?"
+    "❌ Je n'ai pas pu valider la correspondance entre le code postal <strong>CODE_POSTAL</strong> " + // 30
+    "et la ville de <strong>SEARCHED_CITY</strong>. Veux-tu tout de même utiliser ces informations ?",
+
+    "Souhaites-tu utiliser ce numéro pour le contrat : <strong>REF_CONTRAT</strong> ?" // 31
 ];

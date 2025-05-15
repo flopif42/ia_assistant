@@ -10,7 +10,7 @@ const entities = [
         numSIREN: '504 729 286',
         representant: 'M. Michael MALKA',
         fonctionRepr: 'Président',
-        maxNumContrat: 418567
+        maxNumContrat: 41
     },
     {
         nom: 'Capgemini',
@@ -23,7 +23,7 @@ const entities = [
         numSIREN: '328 781 786',
         representant: 'M. Aiman EZZAT',
         fonctionRepr: 'Directeur Général',
-        maxNumContrat: 85419
+        maxNumContrat: 32
     },
     {
         nom: 'Spirica',
@@ -36,6 +36,6 @@ const entities = [
         numSIREN: '487 739 963',
         representant: 'M. Daniel COLLIGNON',
         fonctionRepr: 'Directeur Général',
-        maxNumContrat: 1390
+        maxNumContrat: 17
     }
 ];

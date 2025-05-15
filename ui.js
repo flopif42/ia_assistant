@@ -125,8 +125,8 @@ async function handleUserInput() {
         fournisseur = contrat.fournisseur;
 
         doc.setData({
-            DDYY: DDYY_Date,
-            NUM_CONTRAT: contrat.numContrat,
+            MMYY: MMYY_Date,
+            REF_CONTRAT: contrat.refContrat,
             DATE_SIGNATURE: dateSignature,
 
             // infos fournisseur
@@ -166,7 +166,7 @@ async function handleUserInput() {
 
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(out);
-        downloadLink.download = 'contrat_' + contrat.fournisseur.nom + '_' + contrat.numContrat + '.docx';
+        downloadLink.download = 'contrat_' + contrat.fournisseur.nom + '_' + contrat.refContrat + '.docx';
         downloadLink.textContent = '📄 Télécharger le contrat';
         downloadLink.style.display = 'inline-block';
         downloadLink.style.marginTop = '0.5em';
