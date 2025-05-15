@@ -45,7 +45,7 @@ const responseMessages = [
     "❌ Le montant saisi ne semble pas correct.", // 11
     "❌ Le numéro SIREN doit être composé de 9 chiffres.", // 12
     "❌ Cela ne semble pas être un nom de ville valide.", //13
-    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>." +// 14
+    "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. " +// 14
     "Je vais créer le nouveau contrat avec le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> et les données suivantes :\n", 
 
     "Les différents types de contrat sont :\n\n" +  // 15
