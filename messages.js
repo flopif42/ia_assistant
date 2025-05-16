@@ -24,7 +24,7 @@ const responseMessages = [
     "J'ai compris que tu souhaites créer un <strong>contrat</strong>. Afin de pouvoir t'assister, j'aurais besoin des informations suivantes :\n", // 1
 
     "🏃 On y est presque ! Il ne reste plus qu'une dernière vérification avant la génération de ton document.\n" + // 2
-    "📝 N° du contrat : <strong>REF_CONTRAT</strong> de type Prestation de services entre d'une part :\n\n" + 
+    "📝 N° du contrat : <strong>REF_CONTRAT</strong> de type Prestation de services entre d'une part:\n\n" + 
     "INFOS_FOURNISSEUR\n" +
     "Et d'autre part :\n\n" +
     "INFOS_EMETTEUR\n" +
@@ -49,7 +49,7 @@ const responseMessages = [
     "📝 Le dernier contrat avec ce fournisseur porte le numéro <strong>MAX_NUM_CONTRAT</strong>. " +// 14
     "Je vais créer le nouveau contrat avec le numéro <strong>NUM_CONTRAT_PLUS_UN</strong> et les données suivantes :\n",
 
-    "Les différents types de contrat sont :\n\n" +  // 15
+    "Les différents types de contrat sont:\n\n" +  // 15
     "<strong>1:</strong> Prestation de services\n" +
     "<strong>2:</strong> Contrat cadre <i>(non disponible)</i>\n" +
     "<strong>3:</strong> Contrat d’abonnement <i>(non disponible)</i>\n" +
@@ -84,5 +84,10 @@ const responseMessages = [
     "🏙️ J'ai trouvé cette adresse dans les villes suivantes :\n" + // 33
     "LIST_CITIES" +
     "<strong>NUM_CHOIX_SAISIE_MANUELLE</strong>: Saisir manuellement le code postal\n\n" +
-    "Merci de saisir <strong>le numéro</strong> correspondant à ton choix :"
+    "Merci de saisir <strong>le numéro</strong> correspondant à ton choix :",
+
+    "Très bien. Si tu as besoin d’autres contrats, n’hésite pas à me solliciter.", // 34
+    "Souhaites-tu utiliser la même entité <strong>SAME_ENTITY</strong> comme émetteur pour le nouveau contrat ?", // 35
+    "Peux-tu me préciser la <strong>civilité</strong> de PRENOM_REPR NOM_REPR <i>(M., Mme ou Mlle)</i> ?", // 36
+    "❌ Cela ne semble pas être une adresse valide." // 37
 ];

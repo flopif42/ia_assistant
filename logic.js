@@ -6,11 +6,14 @@ const patternVille = /^[A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+$/;
 const patternCP = /^[0-9]{5}$/;
 const patternCapital = /^[0-9]+$/;
 const patternSiren = /^[0-9]{9}$/;
+const patternCivilite = /^(m|mr|monsieur|mme|madame|mlle|mle|mademoiselle)+$/;
 const patternNomRepr = /^(m|mr|monsieur|mme|madame|mlle|mle|mademoiselle)\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)$/;
+const patternNomReprNoCiv = /^([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-]+)$/;
 const patternAdresseComplete = /^(.*)([0-9]{5})\s+([A-Za-zÉÈÎŒàâçéèëêïîôœûüÿ\-' ]+)$/;
 
 let adrCplCodePostal;
 let adrCplVille;
+let previousEmetteurName = null;
 
 async function computeResponse(userRequest) {
     let AIResponse;
@@ -64,39 +67,39 @@ async function computeResponse(userRequest) {
             }
             break;
 
-      // Le nom du entity est connu, demande si on veut utiliser les données existantes comme émetteur
-      case Step.CONFIRM_USE_EMETTEUR_ENTITY:
-        if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-            contrat.emetteur = entity;
-            AIResponse = responseMessages[19]
-                .replace("NOM_ENTITY", entity.nom)
-                .replace("ROLE_ENTITY", "émetteur") + "\n" + // confirme l'entity pour le role
-                responseMessages[23] + " " +
-                responseMessages[15] // demande le type de contrat
-            processStep = Step.PROMPT_CONTRAT_TYPE;
-        } else {
-            AIResponse = responseMessages[24] + "\n" + responseMessages[25]; 
-            processStep = Step.PROMPT_EMETTEUR_ENTITY;
-        }
-        break;
-        
-    // voulez vous creer une nouvelle entite ?
-    case Step.CONFIRM_CREATE_ENTITY:
-        if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-            AIResponse = promptentityData[0] // demande le nom de l'entité
-            processStep = Step.CREATE_ENTITY;
-            entityCreationSubstep = SubStep.PROMPT_NAME_ENTITY;
-        } else {
-            let additionalMsg;
-            if (previousStep == Step.PROMPT_EMETTEUR_ENTITY) {
-                additionalMsg = responseMessages[25];
+        // Le nom du entity est connu, demande si on veut utiliser les données existantes comme émetteur
+        case Step.CONFIRM_USE_EMETTEUR_ENTITY:
+            if (isConfirmationYes(lowercaseUserRequest)) {
+                contrat.emetteur = entity;
+                AIResponse = responseMessages[19]
+                    .replace("NOM_ENTITY", entity.nom)
+                    .replace("ROLE_ENTITY", "émetteur") + "\n" + // confirme l'entity pour le role
+                    responseMessages[23] + " " +
+                    responseMessages[15] // demande le type de contrat
+                processStep = Step.PROMPT_CONTRAT_TYPE;
             } else {
-                additionalMsg = responseMessages[27];
+                AIResponse = responseMessages[24] + "\n" + responseMessages[25]; 
+                processStep = Step.PROMPT_EMETTEUR_ENTITY;
             }
-            AIResponse = responseMessages[24] + "\n" + additionalMsg; // entité émettrice ou fournisseur ?
-            processStep = previousStep;
-        }
-        break;
+            break;
+        
+        // voulez vous creer une nouvelle entite ?
+        case Step.CONFIRM_CREATE_ENTITY:
+            if (isConfirmationYes(lowercaseUserRequest)) {
+                AIResponse = promptentityData[0] // demande le nom de l'entité
+                processStep = Step.CREATE_ENTITY;
+                entityCreationSubstep = SubStep.PROMPT_NAME_ENTITY;
+            } else {
+                let additionalMsg;
+                if (previousStep == Step.PROMPT_EMETTEUR_ENTITY) {
+                    additionalMsg = responseMessages[25];
+                } else {
+                    additionalMsg = responseMessages[27];
+                }
+                AIResponse = responseMessages[24] + "\n" + additionalMsg; // entité émettrice ou fournisseur ?
+                processStep = previousStep;
+            }
+            break;
 
         // type de contrat
         case Step.PROMPT_CONTRAT_TYPE:
@@ -134,7 +137,7 @@ async function computeResponse(userRequest) {
 
          // confirmation : utiliser les données trouvées pour le fournisseur ?
         case Step.CONFIRM_USE_FOURNISSEUR_ENTITY:
-            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+            if (isConfirmationYes(lowercaseUserRequest)) {
                 contrat.fournisseur = entity;
                 contrat.numContrat = entity.maxNumContrat + 1;
                 contrat.refContrat = "CP-" + MMYY_Date + "-" + contrat.fournisseur.nom + "-" + contrat.numContrat;
@@ -148,7 +151,8 @@ async function computeResponse(userRequest) {
 
         // demande de confirmation des infos
         case Step.CONFIRM_CONTRAT_DATA:
-            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+            if (isConfirmationYes(lowercaseUserRequest)) {
+                previousEmetteurName = contrat.emetteur.nom;
                 contrat.validated = true;
                 AIResponse = responseMessages[4]
                 processStep = Step.CONFIRM_GENERATE_ANOTHER_CONTRAT;
@@ -163,12 +167,30 @@ async function computeResponse(userRequest) {
         // Générer un autre contrat ?
         case Step.CONFIRM_GENERATE_ANOTHER_CONTRAT:
             initAll();
-            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
-                AIResponse = responseMessages[25];
-                processStep = Step.PROMPT_EMETTEUR_ENTITY;
+            if (isConfirmationYes(lowercaseUserRequest)) {
+                previousEntity = getEntity(previousEmetteurName);
+                previousStep = Step.PROMPT_EMETTEUR_ENTITY;
+                AIResponse = responseMessages[35].replace("SAME_ENTITY", previousEntity.nom); // générer un autre contrat avec le meme emetteur ?
+                processStep = Step.CONFIRM_USE_SAME_EMETTEUR;
             } else {
-                AIResponse = responseMessages[3];
+                AIResponse = responseMessages[34];
                 processStep = Step.BEGIN;
+            }
+            break;
+
+        // utiliser la même entité comme émetteur pour ce nouveau contrat ?
+        case Step.CONFIRM_USE_SAME_EMETTEUR:
+            if (isConfirmationYes(lowercaseUserRequest)) {
+                contrat.emetteur = previousEntity;
+                AIResponse = responseMessages[19]
+                    .replace("NOM_ENTITY", previousEntity.nom)
+                    .replace("ROLE_ENTITY", "émetteur") + "\n" + // confirme l'entity pour le role
+                    responseMessages[23] + " " +
+                    responseMessages[15] // demande le type de contrat
+                processStep = Step.PROMPT_CONTRAT_TYPE;
+            } else {
+                AIResponse = responseMessages[25]; // entité émettrice ?
+                processStep = Step.PROMPT_EMETTEUR_ENTITY;
             }
             break;
 
@@ -185,45 +207,49 @@ async function computeResponse(userRequest) {
     
                 // rue
                 case SubStep.PROMPT_ADRESSE_ENTITY:
-                    // commencer par vérifier si une adresse complète a été saisie (rue, CP, ville)
-                    adresseComplete = checkAdresseComplete(userRequest);
-                    if (adresseComplete) {
-                        entity.adresse = capitalize(adresseComplete[1].trim().replace(",", ""));
-                        adrCplCodePostal = adresseComplete[2];
-                        adrCplVille = adresseComplete[3];
+                    if (userRequest.length < 4) {
+                        AIResponse = responseMessages[37] + " " + promptentityData[4];
+                    } else {
+                        // commencer par vérifier si une adresse complète a été saisie (rue, CP, ville)
+                        adresseComplete = checkAdresseComplete(userRequest);
+                        if (adresseComplete) {
+                            entity.adresse = capitalize(adresseComplete[1].trim().replace(",", ""));
+                            adrCplCodePostal = adresseComplete[2];
+                            adrCplVille = adresseComplete[3];
 
-                        // vérifier la concordance du CP et de la ville
-                        const searchedCity = await getCityFromPostalCode(adrCplCodePostal);
-                        if (searchedCity && searchedCity.toLocaleLowerCase() == adrCplVille.toLocaleLowerCase()) {
-                            entity.codePostal = adrCplCodePostal;
-                            entity.ville = capitalize(adrCplVille);
-                            AIResponse = responseMessages[29] // validation cp + ville
-                                .replace("CODE_POSTAL", adrCplCodePostal)
-                                .replace("SEARCHED_CITY", searchedCity) + "\n" + promptentityData[5]; // demande la raison soc
-                            entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
-                        } else {
-                            AIResponse = responseMessages[30] // cp + ville non conforme
-                                .replace("CODE_POSTAL", adrCplCodePostal)
-                                .replace("SEARCHED_CITY", capitalize(adrCplVille));
-                            entityCreationSubstep = SubStep.CONFIRM_USE_CP_VILLE;
-                        }
-                    } else { // not adresse complète (only rue)
-                        entity.adresse = capitalize(userRequest);
-                        // proposer les villes contenant cette adresse
-                        villes = await findCitiesFromAddress(entity.adresse);
-                        if (villes.length == 0) { // aucun résultat
-                            AIResponse = promptentityData[2]; // demande le code postal
-                            entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
-                        } else {
-                            listCities = "";
-                            for (let i = 0; i < villes.length; i++) {
-                                ville = villes[i];
-                                listCities += "<strong>" + (i+1) + "</strong>: " + ville.city + " <i>(" + ville.postcode + ")</i>\n";
+                            // vérifier la concordance du CP et de la ville
+                            const searchedCity = await getCityFromPostalCode(adrCplCodePostal);
+                            if (searchedCity && searchedCity.toLocaleLowerCase() == adrCplVille.toLocaleLowerCase()) {
+                                entity.codePostal = adrCplCodePostal;
+                                entity.ville = capitalize(adrCplVille);
+                                AIResponse = responseMessages[29] // validation cp + ville
+                                    .replace("CODE_POSTAL", adrCplCodePostal)
+                                    .replace("SEARCHED_CITY", searchedCity) + "\n" + promptentityData[5]; // demande la raison soc
+                                entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
+                            } else {
+                                AIResponse = responseMessages[30] // cp + ville non conforme
+                                    .replace("CODE_POSTAL", adrCplCodePostal)
+                                    .replace("SEARCHED_CITY", capitalize(adrCplVille));
+                                entityCreationSubstep = SubStep.CONFIRM_USE_CP_VILLE;
                             }
-                            AIResponse = responseMessages[33] // liste des villes proposées
-                                .replace("LIST_CITIES", listCities)
-                                .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length+1);
-                            entityCreationSubstep = SubStep.PROMPT_CHOIX_VILLES_PROPOSEES;
+                        } else { // not adresse complète (only rue)
+                            entity.adresse = capitalize(userRequest);
+                            // proposer les villes contenant cette adresse
+                            villes = await findCitiesFromAddress(entity.adresse);
+                            if (villes.length == 0) { // aucun résultat
+                                AIResponse = promptentityData[2]; // demande le code postal
+                                entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                            } else {
+                                listCities = "";
+                                for (let i = 0; i < villes.length; i++) {
+                                    ville = villes[i];
+                                    listCities += "<strong>" + (i + 1) + "</strong>: " + ville.city + " <i>(" + ville.postcode + ")</i>\n";
+                                }
+                                AIResponse = responseMessages[33] // liste des villes proposées
+                                    .replace("LIST_CITIES", listCities)
+                                    .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length + 1);
+                                entityCreationSubstep = SubStep.PROMPT_CHOIX_VILLES_PROPOSEES;
+                            }
                         }
                     }
                     break;
@@ -233,8 +259,8 @@ async function computeResponse(userRequest) {
                     numChoix = parseInt(userRequest);
                     if (numChoix == NaN || numChoix < 1 || numChoix > villes.length + 1) {
                         AIResponse = responseMessages[0] + " " + responseMessages[33] // erreur + rafficher la liste des villes proposées
-                            .replace("LIST_CITIES", villes)
-                            .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length);
+                            .replace("LIST_CITIES", listCities)
+                            .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length+1);
                     } else {
                         if (numChoix == villes.length + 1) { // choix de saisie manuelle -> go code postal
                             AIResponse = promptentityData[2]; // demande le code postal
@@ -251,7 +277,7 @@ async function computeResponse(userRequest) {
 
                 // confirmer l'utilisation de CP et Ville qui ne correspondent pas
                 case SubStep.CONFIRM_USE_CP_VILLE:
-                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                    if (isConfirmationYes(lowercaseUserRequest)) {
                         entity.codePostal = adrCplCodePostal;
                         entity.ville = capitalize(adrCplVille);
                         AIResponse = promptentityData[5]; // demande raison sociale
@@ -283,7 +309,7 @@ async function computeResponse(userRequest) {
                 
                 // confirmer l'utilisation de la ville retournée par l'API du gouv
                 case SubStep.CONFIRM_GUESSED_CITY:
-                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                    if (isConfirmationYes(lowercaseUserRequest)) {
                         AIResponse = promptentityData[5]; // demande raison sociale
                         entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
                     } else {
@@ -316,9 +342,8 @@ async function computeResponse(userRequest) {
     
                 // capital
                 case SubStep.PROMPT_CAPITAL_ENTITY:
-                    formattedCapital = userRequest.replaceAll(".", "").replaceAll(",", "");
-                    if (patternCapital.test(formattedCapital) && (parseInt(formattedCapital) != NaN)) {
-                        entity.capital = parseInt(formattedCapital);
+                    if (patternCapital.test(userRequest) && (parseInt(userRequest) != NaN)) {
+                        entity.capital = parseInt(userRequest);
                         AIResponse = promptentityData[7]; // demande la ville d'immat
                         entityCreationSubstep = SubStep.PROMPT_VILLE_IMMAT;
                     } else {
@@ -350,9 +375,34 @@ async function computeResponse(userRequest) {
     
                 // nom représentant
                 case SubStep.PROMPT_REPR_ENTITY:
-                    nomRepr = checkNomRepresentant(userRequest);
-                    if (nomRepr) {
-                        entity.representant = nomRepr;
+                    repr = checkNomRepresentant(userRequest);
+                    if (repr) {
+                        if (repr.civilite == null) {
+                            AIResponse = responseMessages[36]
+                                .replace("PRENOM_REPR", repr.prenom)
+                                .replace("NOM_REPR", repr.nom); // préciser la civilité
+                            entityCreationSubstep = SubStep.PROMPT_CIVILITE_REPR;
+                        } else {
+                            entity.representant = formatCivilite(repr.civilite) + " " + repr.prenom + " " + repr.nom;
+
+                            // proposer la qualité du représentant en fonction du type de société
+                            entity.fonctionRepr = getFctRepProposition(entity.raisonSociale);
+                            AIResponse = responseMessages[32]
+                                .replace("REPR_ENTITY", entity.representant)
+                                .replace("PROPOSED_FCT", entity.fonctionRepr); // utiliser la qualité proposée ?
+                            entityCreationSubstep = SubStep.CONFIRM_USE_PROPOSED_FCT_REP;
+                        }
+                    } else {
+                        AIResponse = responseMessages[28] + "\n" + promptentityData[9].replace("NOM_ENTITY", entity.nom); // format nom représentant invalide
+                    }
+                    break;
+
+                // civilité ?
+                case SubStep.PROMPT_CIVILITE_REPR:
+                    regexResult = patternCivilite.exec(lowercaseUserRequest.replace(".", ""));
+                    if (regexResult) {
+                        repr.civilite = regexResult[1];
+                        entity.representant = formatCivilite(repr.civilite) + " " + repr.prenom + " " + repr.nom;
 
                         // proposer la qualité du représentant en fonction du type de société
                         entity.fonctionRepr = getFctRepProposition(entity.raisonSociale);
@@ -361,13 +411,15 @@ async function computeResponse(userRequest) {
                             .replace("PROPOSED_FCT", entity.fonctionRepr); // utiliser la qualité proposée ?
                         entityCreationSubstep = SubStep.CONFIRM_USE_PROPOSED_FCT_REP;
                     } else {
-                        AIResponse = responseMessages[28] + "\n" + promptentityData[9].replace("NOM_ENTITY", entity.nom); // format nom représentant invalide
+                        AIResponse = responseMessages[32]
+                            .replace("PRENOM_REPR", repr.prenom)
+                            .replace("NOM_REPR", repr.nom); // préciser la civilité
                     }
                     break;
 
                 // confirmer le choix de la fonction/qualité du représentant
                 case SubStep.CONFIRM_USE_PROPOSED_FCT_REP:
-                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                    if (isConfirmationYes(lowercaseUserRequest)) {
                         AIResponse = responseMessages[22]
                             .replaceAll('NOM_ENTITY', entity.nom)
                             .replace('ADR_ENTITY', entity.adresse)
@@ -407,7 +459,7 @@ async function computeResponse(userRequest) {
     
                 // confirmer les infos de la création de l'entity
                 case SubStep.CONFIRM_ENTITY_DATA:
-                    if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+                    if (isConfirmationYes(lowercaseUserRequest)) {
                         let roleEntity;
                         let additionalMsg;
                         let persistedEntity = structuredClone(entity);
@@ -447,7 +499,7 @@ async function computeResponse(userRequest) {
 
         // confirme si utiliser la ref contrat générée ou saisie manuelle
         case Step.CONFIRM_USE_GENERATED_REF_CONTRAT:
-            if (lowercaseUserRequest.includes('oui') || lowercaseUserRequest.includes('ok')) {
+            if (isConfirmationYes(lowercaseUserRequest)) {
                 AIResponse = getConfirmationMsg();
                 processStep = Step.CONFIRM_CONTRAT_DATA;
             } else {
@@ -508,8 +560,8 @@ function getConfirmationMsg() {
 }
 
 function getEntity(keyword) {
-    keyword = keyword.toLowerCase();
-    return entities.find(entity => entity.nom.toLowerCase().includes(keyword));
+    keyword = keyword.toLowerCase().replaceAll(" ", "");
+    return entities.find(entity => entity.nom.toLowerCase().replaceAll(" ", "").includes(keyword));
 }
 
 async function getCityFromPostalCode(cp) {
@@ -559,14 +611,23 @@ function capitalize(input) {
 }
 
 function checkNomRepresentant(userText) {
-    matches = patternNomRepr.exec(userText.toLocaleLowerCase().replace(".", ""));
-    if (!matches) {
-        return null;
+    let representant = {};
+    fullMatch = patternNomRepr.exec(userText.toLocaleLowerCase().replace(".", ""));
+    if (fullMatch) { // match civ prenom nom
+        representant.civilite = formatCivilite(fullMatch[1]);
+        representant.prenom = capitalize(fullMatch[2]);
+        representant.nom = fullMatch[3].toLocaleUpperCase();
+    } else {
+        partialMatch = patternNomReprNoCiv.exec(userText.toLocaleLowerCase());
+        if (partialMatch) { // match prenom nom
+            representant.civilite = null;
+            representant.prenom = capitalize(partialMatch[1]);
+            representant.nom = partialMatch[2].toLocaleUpperCase();
+        } else {
+            return null;
+        }
     }
-    civ = formatCivilite(matches[1]);
-    prenom = capitalize(matches[2]);
-    nom = matches[3].toLocaleUpperCase();
-    return civ + " " + prenom + " " + nom;
+    return representant;
 }
 
 async function isValidFrenchCity(cityName) {
@@ -643,4 +704,8 @@ function listEntities() {
         }
     }
     return response;
+}
+
+function isConfirmationYes(input) {
+    return (input.includes('oui') || input.includes('ok') || input.includes('yes'));
 }

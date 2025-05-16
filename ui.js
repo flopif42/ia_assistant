@@ -77,6 +77,8 @@ async function handleUserInput() {
     const userInputText = userInput.value.trim();
     if (!userInputText) return;
 
+    disableUserInput();
+
     userInput.value = '';
     sendButton.disabled = true;
 
@@ -183,6 +185,7 @@ async function handleUserInput() {
         initAll();
         await typeMessage(responseMessages[5]);  // "générer un autre contrat ?"
     }
+    enableUserInput();
 }
 
 function getRandomBotDelay(min = minBotDelayMs, max = maxBotDelayMs) {
@@ -216,4 +219,15 @@ function showThinkingDots() {
         clearInterval(interval);
         dotsMessage.remove();
     };
+}
+
+function disableUserInput() {
+    userInput.disabled = true;
+    sendButton.disabled = true;
+}
+
+function enableUserInput() {
+    userInput.disabled = false;
+    sendButton.disabled = userInput.value.trim() === '';
+    userInput.focus();
 }

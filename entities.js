@@ -37,5 +37,18 @@ const entities = [
         representant: 'M. Daniel COLLIGNON',
         fonctionRepr: 'Directeur Général',
         maxNumContrat: 17
+    },
+    {
+        nom: '1001 vies',
+        adresse: '31 - 35 rue de la Fédération - Carré Suffren',
+        codePostal: '75015',
+        ville: 'Paris',
+        raisonSociale: 'SA',
+        capital: 37000,
+        villeImmat: 'Paris',
+        numSIREN: '492 644 323',
+        representant: 'Mme Sandrine Malherbe',
+        fonctionRepr: 'Directrice des Achats Groupe',
+        maxNumContrat: 32
     }
 ];
