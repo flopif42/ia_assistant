@@ -30,6 +30,8 @@ async function computeResponse(userRequest) {
             if (lowercaseUserRequest.includes('contrat')) {
                 AIResponse = responseMessages[1] + responseMessages[25]; // entité émettrice ?
                 processStep = Step.PROMPT_EMETTEUR_ENTITY;
+            } else if (lowercaseUserRequest.includes('entité')) {
+                AIResponse = listEntities();
             } else {
                 AIResponse = responseMessages[0]; //  je n'ai pas compris
             }
@@ -180,7 +182,7 @@ async function computeResponse(userRequest) {
     
                 // rue
                 case SubStep.PROMPT_ADRESSE_ENTITY:
-                    let isAdresseCompleteOK = false;
+                    // commencer par vérifier si une adresse complète a été saisie (rue, CP, ville)
                     adresseComplete = checkAdresseComplete(userRequest);
                     if (adresseComplete) {
                         entity.adresse = capitalize(adresseComplete[1].trim().replace(",", ""));
@@ -204,8 +206,43 @@ async function computeResponse(userRequest) {
                         }
                     } else { // not adresse complète (only rue)
                         entity.adresse = capitalize(userRequest);
-                        AIResponse = promptentityData[2]; // demande le code postal
-                        entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                        // proposer les villes contenant cette adresse
+                        villes = await findCitiesFromAddress(entity.adresse);
+                        if (villes.length == 0) { // aucun résultat
+                            AIResponse = promptentityData[2]; // demande le code postal
+                            entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                        } else {
+                            listCities = "";
+                            for (let i = 0; i < villes.length; i++) {
+                                ville = villes[i];
+                                listCities += "<strong>" + (i+1) + "</strong>: " + ville.city + " <i>(" + ville.postcode + ")</i>\n";
+                            }
+                            AIResponse = responseMessages[33] // liste des villes proposées
+                                .replace("LIST_CITIES", listCities)
+                                .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length+1);
+                            entityCreationSubstep = SubStep.PROMPT_CHOIX_VILLES_PROPOSEES;
+                        }
+                    }
+                    break;
+
+                // choix parmi les villes proposées OU "saisir manuellement le code postal"
+                case SubStep.PROMPT_CHOIX_VILLES_PROPOSEES:
+                    numChoix = parseInt(userRequest);
+                    if (numChoix == NaN || numChoix < 1 || numChoix > villes.length + 1) {
+                        AIResponse = responseMessages[0] + " " + responseMessages[33] // erreur + rafficher la liste des villes proposées
+                            .replace("LIST_CITIES", villes)
+                            .replace("NUM_CHOIX_SAISIE_MANUELLE", villes.length);
+                    } else {
+                        if (numChoix == villes.length + 1) { // choix de saisie manuelle -> go code postal
+                            AIResponse = promptentityData[2]; // demande le code postal
+                            entityCreationSubstep = SubStep.PROMPT_CP_ENTITY;
+                        } else {
+                            ville = villes[numChoix - 1];
+                            entity.codePostal = ville.postcode;
+                            entity.ville = ville.city;
+                            AIResponse = promptentityData[5]; // demande raison sociale
+                            entityCreationSubstep = SubStep.PROMPT_RAISON_SOC_ENTITY;
+                        }
                     }
                     break;
 
@@ -321,7 +358,7 @@ async function computeResponse(userRequest) {
                             .replace("PROPOSED_FCT", entity.fonctionRepr); // utiliser la qualité proposée ?
                         entityCreationSubstep = SubStep.CONFIRM_USE_PROPOSED_FCT_REP;
                     } else {
-                        AIResponse = responseMessages[28] + "\n" + promptentityData[9]; // format nom représentant invalide
+                        AIResponse = responseMessages[28] + "\n" + promptentityData[9].replace("NOM_ENTITY", entity.nom); // format nom représentant invalide
                     }
                     break;
 
@@ -567,4 +604,38 @@ function getFctRepProposition(raisonSociale) {
         default:
             return null;
     }
+}
+
+async function findCitiesFromAddress(address) {
+    const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(address)}&limit=5`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.features.map(f => ({
+        city: f.properties.city,
+        postcode: f.properties.postcode,
+        full: f.properties.label
+    }));
+}
+
+function listEntities() {
+    response = "Voici la liste des entités dans la base :\n";
+    for (let i = 0; i < entities.length; i++) {
+        entity = entities[i];
+        response += "<p>" + fillTemplate(infosRecap, {
+            NOM_ENTITY: entity.nom,
+            ADR_ENTITY: entity.adresse,
+            CP_ENTITY: entity.codePostal,
+            VILLE_ENTITY: entity.ville,
+            RS_ENTITY: entity.raisonSociale,
+            CAPITAL_ENTITY: formatCapital(entity.capital),
+            IMMAT_ENTITY: entity.villeImmat,
+            SIREN_ENTITY: entity.numSIREN,
+            REPR_ENTITY: entity.representant,
+            FCT_REP_ENTITY: entity.fonctionRepr
+        }) + "</p>";
+        if (i < entities.length-1) {
+            response += "<hr />";
+        }
+    }
+    return response;
 }

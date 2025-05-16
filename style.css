@@ -123,3 +123,22 @@ html, body {
     background-color: #ffffff;
 }
 
+#appFooter {
+    text-align: center;
+    font-size: 0.8em;
+    color: #777;
+    padding: 0.5rem 0;
+    margin-top: 0.2rem;
+    border-top: none;
+    background-color: #f9f9f9;
+}
+
+#appFooter a {
+color: #555;
+text-decoration: none;
+margin-left: 0.5em;
+}
+
+#appFooter a:hover {
+    text-decoration: underline;
+}
