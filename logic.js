@@ -25,13 +25,16 @@ async function computeResponse(userRequest) {
         return AIResponse;
     }
 
+    if (lowercaseUserRequest.includes('entité')) {
+        AIResponse = listEntities();
+        return AIResponse;
+    }
+
     switch (processStep) {
         case Step.BEGIN:
             if (lowercaseUserRequest.includes('contrat')) {
                 AIResponse = responseMessages[1] + responseMessages[25]; // entité émettrice ?
                 processStep = Step.PROMPT_EMETTEUR_ENTITY;
-            } else if (lowercaseUserRequest.includes('entité')) {
-                AIResponse = listEntities();
             } else {
                 AIResponse = responseMessages[0]; //  je n'ai pas compris
             }
@@ -618,20 +621,22 @@ async function findCitiesFromAddress(address) {
 }
 
 function listEntities() {
-    response = "Voici la liste des entités dans la base :\n";
+    let savedEntity;
+    let response = "Voici la liste des entités dans la base :\n";
+
     for (let i = 0; i < entities.length; i++) {
-        entity = entities[i];
+        savedEntity = entities[i];
         response += "<p>" + fillTemplate(infosRecap, {
-            NOM_ENTITY: entity.nom,
-            ADR_ENTITY: entity.adresse,
-            CP_ENTITY: entity.codePostal,
-            VILLE_ENTITY: entity.ville,
-            RS_ENTITY: entity.raisonSociale,
-            CAPITAL_ENTITY: formatCapital(entity.capital),
-            IMMAT_ENTITY: entity.villeImmat,
-            SIREN_ENTITY: entity.numSIREN,
-            REPR_ENTITY: entity.representant,
-            FCT_REP_ENTITY: entity.fonctionRepr
+            NOM_ENTITY: savedEntity.nom,
+            ADR_ENTITY: savedEntity.adresse,
+            CP_ENTITY: savedEntity.codePostal,
+            VILLE_ENTITY: savedEntity.ville,
+            RS_ENTITY: savedEntity.raisonSociale,
+            CAPITAL_ENTITY: formatCapital(savedEntity.capital),
+            IMMAT_ENTITY: savedEntity.villeImmat,
+            SIREN_ENTITY: savedEntity.numSIREN,
+            REPR_ENTITY: savedEntity.representant,
+            FCT_REP_ENTITY: savedEntity.fonctionRepr
         }) + "</p>";
         if (i < entities.length-1) {
             response += "<hr />";
