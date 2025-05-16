@@ -1,5 +1,5 @@
 const promptentityData = [
-    "Merci de saisir le <strong>nom</strong> 🏦 de l'entité :", // 0
+    "Merci de saisir le <strong>nom complet</strong> 🏦 de l'entité :", // 0
     "Merci de saisir la <strong>référence</strong> du contrat 📝 :", // 1
     "Merci de saisir le <strong>code postal</strong> de l'entité :", // 2
     "Merci de saisir la <strong>ville</strong> de l'entité :", // 3
@@ -89,5 +89,6 @@ const responseMessages = [
     "Très bien. Si tu as besoin d’autres contrats, n’hésite pas à me solliciter.", // 34
     "Souhaites-tu utiliser la même entité <strong>SAME_ENTITY</strong> comme émetteur pour le nouveau contrat ?", // 35
     "Peux-tu me préciser la <strong>civilité</strong> de PRENOM_REPR NOM_REPR <i>(M., Mme ou Mlle)</i> ?", // 36
-    "❌ Cela ne semble pas être une adresse valide." // 37
+    "❌ Cela ne semble pas être une adresse valide.", // 37
+    "Est-ce que tu veux utiliser <strong>NOM_ENTITY</strong> comme nom pour la nouvelle entité ?" // 38
 ];

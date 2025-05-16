@@ -61,7 +61,8 @@ async function computeResponse(userRequest) {
                     .replace('FCT_REP_ENTITY', entity.fonctionRepr)
                     .replace('ROLE_ENTITY', "société émettrice")
                 processStep = Step.CONFIRM_USE_EMETTEUR_ENTITY;
-            } else { 
+            } else {
+                entityKeyword = userRequest;
                 AIResponse = responseMessages[16].replace('NOM_ENTITY', userRequest); // entité non trouvée, la créer ?
                 processStep = Step.CONFIRM_CREATE_ENTITY;
             }
@@ -86,9 +87,9 @@ async function computeResponse(userRequest) {
         // voulez vous creer une nouvelle entite ?
         case Step.CONFIRM_CREATE_ENTITY:
             if (isConfirmationYes(lowercaseUserRequest)) {
-                AIResponse = promptentityData[0] // demande le nom de l'entité
+                AIResponse = responseMessages[38].replace("NOM_ENTITY", entityKeyword); // utiliser le mot-clé comme nom pour l'entité ?
                 processStep = Step.CREATE_ENTITY;
-                entityCreationSubstep = SubStep.PROMPT_NAME_ENTITY;
+                entityCreationSubstep = SubStep.CONFIRM_USE_KEYWORD_AS_NAME_ENTITY;
             } else {
                 let additionalMsg;
                 if (previousStep == Step.PROMPT_EMETTEUR_ENTITY) {
@@ -130,6 +131,7 @@ async function computeResponse(userRequest) {
                     .replace('ROLE_ENTITY', "fournisseur")
                 processStep = Step.CONFIRM_USE_FOURNISSEUR_ENTITY;
             } else {
+                entityKeyword = userRequest;
                 AIResponse = responseMessages[16].replace('NOM_ENTITY', userRequest); // entité non trouvée, la créer ?
                 processStep = Step.CONFIRM_CREATE_ENTITY;
             }
@@ -197,9 +199,21 @@ async function computeResponse(userRequest) {
         // CREATION ENTITY
         case Step.CREATE_ENTITY:
             switch (entityCreationSubstep) {
+                // utilise le mot-clé de la recherche entité comme nom ?
+                case SubStep.CONFIRM_USE_KEYWORD_AS_NAME_ENTITY:
+                    entity = {};
+                    if (isConfirmationYes(lowercaseUserRequest)) {
+                        entity.nom = entityKeyword;
+                        AIResponse = promptentityData[4]; // demande la rue
+                        entityCreationSubstep = SubStep.PROMPT_ADRESSE_ENTITY
+                    } else {
+                        AIResponse = promptentityData[0]; // demande le nom de l'entité
+                        entityCreationSubstep = SubStep.PROMPT_NAME_ENTITY;
+                    }
+                    break;
+
                 // nom
                 case SubStep.PROMPT_NAME_ENTITY:
-                    entity = {};
                     entity.nom = userRequest;
                     AIResponse = promptentityData[4]; // demande la rue
                     entityCreationSubstep = SubStep.PROMPT_ADRESSE_ENTITY
@@ -376,6 +390,7 @@ async function computeResponse(userRequest) {
                 // nom représentant
                 case SubStep.PROMPT_REPR_ENTITY:
                     repr = checkNomRepresentant(userRequest);
+
                     if (repr) {
                         if (repr.civilite == null) {
                             AIResponse = responseMessages[36]
@@ -383,8 +398,7 @@ async function computeResponse(userRequest) {
                                 .replace("NOM_REPR", repr.nom); // préciser la civilité
                             entityCreationSubstep = SubStep.PROMPT_CIVILITE_REPR;
                         } else {
-                            entity.representant = formatCivilite(repr.civilite) + " " + repr.prenom + " " + repr.nom;
-
+                            entity.representant = repr.civilite + " " + repr.prenom + " " + repr.nom;
                             // proposer la qualité du représentant en fonction du type de société
                             entity.fonctionRepr = getFctRepProposition(entity.raisonSociale);
                             AIResponse = responseMessages[32]
@@ -401,8 +415,8 @@ async function computeResponse(userRequest) {
                 case SubStep.PROMPT_CIVILITE_REPR:
                     regexResult = patternCivilite.exec(lowercaseUserRequest.replace(".", ""));
                     if (regexResult) {
-                        repr.civilite = regexResult[1];
-                        entity.representant = formatCivilite(repr.civilite) + " " + repr.prenom + " " + repr.nom;
+                        repr.civilite = formatCivilite(regexResult[1]);
+                        entity.representant = repr.civilite + " " + repr.prenom + " " + repr.nom;
 
                         // proposer la qualité du représentant en fonction du type de société
                         entity.fonctionRepr = getFctRepProposition(entity.raisonSociale);
